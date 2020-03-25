@@ -11,6 +11,20 @@ def zacetna_stran():
 def nova_naprava():
     return bottle.template('nova_oprema.html')
 
+@bottle.get('/opis-naprave/')
+def opis_opreme():
+    return bottle.template('opis_naprave.html', inventarna=None)
+
+@bottle.post('/opis-naprave/')
+def opis_post():
+    inventarna = bottle.request.forms['inventarna']
+    return bottle.template('opis_naprave.html', inventarna=inventarna)
+
+
+@bottle.get('/izpisi/')
+def izpisi():
+    return bottle.template('izpis.html')
+
 
 
 bottle.run(debug=True, reloader=True)

@@ -1,0 +1,226 @@
+% rebase('osnova.html')
+
+<section class="hero">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <h1 class="title is-1">
+                Servis naprav
+            </h1>
+        </div>
+    </div>
+</section>
+<a href="/" class="button is-primary is-large">Nazaj</a>
+
+<form method="POST">
+
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Inventarna št</label>
+        </div>
+        <div class="field-body has-addons">
+            <p class="control"><input class="input" type="text" name="inventarna"></p>
+        </div>
+    </div>
+    <nav class="level">
+        <div class="level-left"></div>
+        <div class="level-right">
+            <input class="button is-primary is-large" type="submit" value="Prikaži podatke"></input>
+        </div>
+    </nav>
+</form>
+
+%if inventarna:
+
+<div class="field is-horizontal">
+    <div class="field-label">
+        <label class="label">Naziv</label>
+    </div>
+    <div class="field-body">
+        <div class="field">
+            <label class="label">{{inventarna}}</label>
+        </div>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column has-text-right is-one-fifth">
+        <div class="field">
+            <label class="label">Tip</label>
+        </div>
+        <div class="field">
+            <label class="label">Serijska št</label>
+        </div>
+        <div class="field">
+            <label class="label">Stroškovno mesto</label>
+        </div>
+        <div class="field">
+            <label class="label">Dobavitelj</label>
+        </div>
+    </div>
+    <div class="column is-one-fifth">
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+    </div>
+    <div class="column is-one-fifth has-text-right">
+        <div class="field">
+            <label class="label">Garancija</label>
+        </div>
+        <div class="field">
+            <label class="label">Lokacija</label>
+        </div>
+        <div class="field">
+            <label class="label">Proizvajalec</label>
+        </div>
+        <div class="field">
+            <label class="label">Skrbnik</label>
+        </div>
+    </div>
+    <div class="column is-one-fifth">
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="table-container">
+            <table class="table is-striped is-fullwidth is-hoverable is-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            <p class="has-text-centered">Datum odtujitve</p>
+                        </th>
+                        <th>
+                            <p class="has-text-centered">Datum vrnitve</p>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>12.01.2020</td>
+                        <td>12.01.2020</td>
+                    </tr>
+                    <tr>
+                        <td>12.01.2020</td>
+                        <td>12.01.2020</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column has-text-right">
+        <div class="field">
+            <label class="label">Datum dobave</label>
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+    </div>
+    <div class="column has-text-right">
+        <div class="field">
+            <label class="label">Serviser</label>
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+    </div>
+    <div class="column has-text-right">
+        <div class="field">
+            <label class="label">Redni letni pregled</label>
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <div class="field">
+                <label class="label">{{inventarna}}</label>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="table-container">
+    <table class="table is-striped is-fullwidth is-hoverable is-bordered">
+        <thead>
+            <tr>
+                <th>
+                    <p class="has-text-centered">Aktivacija postopka</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">RLP / Popravilo</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">Datum prevzema</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">Datum vrnitve</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">Opombe</p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>12.01.2020</td>
+                <td>RLP</td>
+                <td>13.01.2020</td>
+                <td>25.01.2020</td>
+                <td>Obrabljeno desno kolo</td>
+            </tr>
+            <tr>
+                <td>12.01.2020</td>
+                <td>RLP</td>
+                <td>13.01.2020</td>
+                <td>25.01.2020</td>
+                <td>Obrabljeno desno kolo</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+%end
