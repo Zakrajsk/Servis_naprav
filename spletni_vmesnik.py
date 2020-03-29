@@ -1,6 +1,6 @@
 import bottle
 
-
+bottle.TEMPLATE_PATH.insert(0,'views')
 
 
 @bottle.get('/')
@@ -20,10 +20,14 @@ def opis_post():
     inventarna = bottle.request.forms['inventarna']
     return bottle.template('opis_naprave.html', inventarna=inventarna)
 
-
 @bottle.get('/izpisi/')
 def izpisi():
-    return bottle.template('izpis.html')
+    return bottle.template('izpis.html', tip_izpisa=None)
+
+@bottle.post('/izpisi/')
+def izpisi_post():
+    tip_izpisa = bottle.request.forms['tip_izpisa']
+    return bottle.template('izpis.html', tip_izpisa=tip_izpisa)
 
 
 

@@ -13,17 +13,40 @@
 
 <form method="POST">
 
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Vrsta izpisa</label>
+    <div class="columns is-gapless is-vcentered">
+        <div class="column is-3">
+            <div class="field-label is-normal">
+                <label class="label">Vrsta izpisa</label>
+            </div>
         </div>
-        <div class="field-body">
+        <div class="column is-2">
             <div class="select">
-                <select>
-                  <option>Select dropdown</option>
-                  <option>With options</option>
+                <select name="tip_izpisa">
+                    <option value='RLP'>Po RLP-ju</option>
+                    <option value='Skrbniki'>Po skrbnikih</option>
                 </select>
-              </div>
+            </div>
+        </div>
+        <div class="column">
+            <input class="button is-primary is-large" type="submit" value="Prikaži podatke"></input>
         </div>
     </div>
+   
+% if tip_izpisa:
+<table class="table is-fullwidth">
+    <thead>
+      <tr>
+        <th><abbr title="Position">Naziv</abbr></th>
+        <th><abbr title="Played">Tip</abbr></th>
+        <th><abbr title="Won">Datum</abbr></th>
+        <th><abbr title="Drawn">Datum</abbr></th>
+      </tr>
+    </thead>
+    <tbody>
+
+    </tbody>    
+</table>
+
+%end
+
 </form>
