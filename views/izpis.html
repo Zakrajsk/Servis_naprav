@@ -22,8 +22,13 @@
         <div class="column is-2">
             <div class="select">
                 <select name="tip_izpisa">
-                    <option value='RLP'>Po RLP-ju</option>
-                    <option value='Skrbniki'>Po skrbnikih</option>
+                    <option value='lokacije'>Po lokaciji</option>
+                    <option value='serviserji'>Po serviserjih</option>
+                    <option value='RLP'>Naslednji RLP</option>
+                    <option value='Odpisani'>Odpisani</option>
+                    <option value='Odtujeni'>Odtujeni</option>
+                    <option value='Nazivi'>Po nazivu</option>
+                    <option value='Brez_RLP'>Brez RLP-ja</option>
                 </select>
             </div>
         </div>
@@ -31,7 +36,8 @@
             <input class="button is-primary is-large" type="submit" value="Prikaži podatke"></input>
         </div>
     </div>
-   
+</form>
+
 % if tip_izpisa:
 <table class="table is-fullwidth">
     <thead>
@@ -49,4 +55,3 @@
 
 %end
 
-</form>

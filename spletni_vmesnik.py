@@ -29,6 +29,15 @@ def izpisi_post():
     tip_izpisa = bottle.request.forms['tip_izpisa']
     return bottle.template('izpis.html', tip_izpisa=tip_izpisa)
 
+@bottle.get('/aktivacija-postopka/')
+def aktiviraj_postopek():
+    return bottle.template('aktivacija_postopka.html', inventarna=None)
+
+@bottle.post('/aktivacija-postopka/')
+def aktiviraj_postopek_post():
+    inventarna = bottle.request.forms['inventarna']
+    return bottle.template('aktivacija_postopka.html', inventarna=inventarna)
+
 
 
 bottle.run(debug=True, reloader=True)
