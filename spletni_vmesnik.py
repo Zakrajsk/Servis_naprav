@@ -38,6 +38,33 @@ def aktiviraj_postopek_post():
     inventarna = bottle.request.forms['inventarna']
     return bottle.template('aktivacija_postopka.html', inventarna=inventarna)
 
+@bottle.get('/prevzem/')
+def prevzem():
+    return bottle.template('prevzem.html', inventarna=None)
+
+@bottle.post('/prevzem/')
+def prevzem_post():
+    inventarna = bottle.request.forms['inventarna']
+    return bottle.template('prevzem.html', inventarna=inventarna)
+
+@bottle.get('/vrnitev/')
+def vrnitev():
+    return bottle.template('vrnitev.html', inventarna=None)
+
+@bottle.post('/vrnitev/')
+def vrnitev_post():
+    inventarna = bottle.request.forms['inventarna']
+    return bottle.template('vrnitev.html', inventarna=inventarna)
+
+@bottle.get('/zakljucek/')
+def zakljuci():
+    return bottle.template('zakljuci.html', inventarna=None)
+
+@bottle.post('/zakljucek/')
+def zakluci_post():
+    inventarna = bottle.request.forms['inventarna']
+    return bottle.template('zakljuci.html', inventarna=inventarna)
+
 
 
 bottle.run(debug=True, reloader=True)

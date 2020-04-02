@@ -12,26 +12,35 @@
 <div class="container">
     <div class="buttons are-large">
         <a href="/nova-oprema/" class="button is-primary">Dodaj novo opremo<a>
-        <a href="/opis-naprave/" class="button">Opis naprave</a>
-        <a href="/izpisi/" class="button">Izpis</a>
+        <a href="/opis-naprave/" class="button is-primary">Opis naprave</a>
+        <a href="/izpisi/" class="button is-primary">Izpis</a>
     </div>
 
     <div class="buttons are-large">
         <a href="/aktivacija-postopka/" class="button is-primary">Aktiviraj postopek</a>
-        <button class="button">Prevzem</button>
-        <button class="button">Vrnjeno</button>
-        <button class="button">Zaključi</button>
+        <a href="/prevzem/" class="button is-primary">Prevzem</a>
+        <a href="/vrnitev/" class="button is-primary">Vrnjeno</a>
+        <a href="/zakljucek/" class="button is-primary">Zaključi</a>
     </div>
 
     <div class="buttons are-large">
-        <button class="button is-primary">Aktivirani aparati</button>
+        <button class="button">Aktivirani aparati</button>
         <button class="button">Na servisu</button>
         <button class="button">Popravljeni nedokončani</button>
     </div>
 
     <div class="buttons are-large">
-        <button class="button is-primary">Odtujen</button>
+        <button class="button">Odtujen</button>
         <button class="button">Postopek odpisa</button>
         <button class="button">Odpis</button>
     </div>
 </div>
+
+<p id="date"></p>
+<script>
+n =  new Date();
+y = n.getFullYear();
+m = n.getMonth() + 1;
+d = n.getDate();
+document.getElementById("date").innerHTML = m + "/" + d + "/" + y;
+</script>

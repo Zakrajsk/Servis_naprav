@@ -1,0 +1,59 @@
+% rebase('osnova.html')
+
+<section class="hero">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <h1 class="title is-1">
+                Servis naprav
+            </h1>
+        </div>
+    </div>
+</section>
+<a href="/" class="button is-primary is-large">Nazaj</a>
+
+<form method="POST">
+
+    <div class="columns is-gapless is-vcentered">
+        <div class="column is-3">
+            <div class="field-label is-normal">
+                <label class="label">Inventarna št</label>
+            </div>
+        </div>
+        <div class="column is-2">
+            <div class="field-body has-addons">
+                <p class="control"><input class="input" type="text" name="inventarna"></p>
+            </div>
+        </div>
+        <div class="column">
+            <input class="button is-primary is-large" type="submit" value="Poizvej"></input>
+        </div>
+    </div>
+</form>
+
+%if inventarna:
+<div class="column is-8">
+    <div class="field is-horizontal">
+        <div class="field-label">
+            <label class="label">Naziv</label>
+        </div>
+        <div class="field-body">
+            <label class="label">{{inventarna}}</label>
+        </div>
+    </div>
+    <div class="field is-horizontal">
+        <div class="field-label">
+            <label class="label">Lokacija</label>
+        </div>
+        <div class="field-body">
+            <label class="label">{{inventarna}}</label>
+        </div>
+    </div>
+</div>
+<div class="columns">
+    <div class="column is-offset-3">
+        <input class="button is-primary is-large" type="submit" value="Zaključi"></input>
+    </div>
+</div>
+
+
+%end

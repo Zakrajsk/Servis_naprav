@@ -13,20 +13,21 @@
 
 <form method="POST">
 
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Inventarna št</label>
+    <div class="columns is-gapless is-vcentered">
+        <div class="column is-3">
+            <div class="field-label is-normal">
+                <label class="label">Inventarna št</label>
+            </div>
         </div>
-        <div class="field-body has-addons">
-            <p class="control"><input class="input" type="text" name="inventarna"></p>
+        <div class="column is-2">
+            <div class="field-body has-addons">
+                <p class="control"><input class="input" type="text" name="inventarna"></p>
+            </div>
         </div>
-    </div>
-    <nav class="level">
-        <div class="level-left"></div>
-        <div class="level-right">
+        <div class="column">
             <input class="button is-primary is-large" type="submit" value="Prikaži podatke"></input>
         </div>
-    </nav>
+    </div>
 </form>
 
 %if inventarna:
