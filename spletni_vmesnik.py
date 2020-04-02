@@ -65,6 +65,18 @@ def zakluci_post():
     inventarna = bottle.request.forms['inventarna']
     return bottle.template('zakljuci.html', inventarna=inventarna)
 
+@bottle.get('/aktivirane-naprave/')
+def aktivirane_naprave():
+    return bottle.template('aktivirane_naprave.html')
+
+@bottle.get('/na-servisu/')
+def na_servisu():
+    return bottle.template('na_servisu.html')
+
+@bottle.get('/nedokoncani/')
+def nedokoncani():
+    return bottle.template('nedokoncani.html')
+
 
 
 bottle.run(debug=True, reloader=True)
