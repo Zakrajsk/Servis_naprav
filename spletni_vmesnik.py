@@ -77,6 +77,23 @@ def na_servisu():
 def nedokoncani():
     return bottle.template('nedokoncani.html')
 
+@bottle.get('/odtujen/')
+def odtujen():
+    return bottle.template('odtujen.html', inventarna=None)
+
+@bottle.post('/odtujen/')
+def odtujen_post():
+    inventarna = bottle.request.forms['inventarna']
+    return bottle.template('odtujen.html', inventarna=inventarna)
+
+@bottle.get('/odpis/')
+def odpis():
+    return bottle.template('odpis.html', inventarna=None)
+
+@bottle.post('/odpis/')
+def odpis_post():
+    inventarna = bottle.request.forms['inventarna']
+    return bottle.template('odpis.html', inventarna=inventarna)
 
 
 bottle.run(debug=True, reloader=True)
