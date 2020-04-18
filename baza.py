@@ -72,6 +72,7 @@ class Tabela():
         cur = self.conn.execute(poizvedba, podatki)
         return cur.lastrowid
 
+
 class Naprava(Tabela):
     """
     Tabela za naprave
