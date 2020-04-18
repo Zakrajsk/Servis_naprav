@@ -69,6 +69,9 @@ class Tabela():
         """
         if poizvedba is None:
             poizvedba = self.dodajanje(stevilo=len(podatki))
+        for i in range(len(podatki)):
+            if podatki[i] == "":
+                podatki[i] = None
         cur = self.conn.execute(poizvedba, podatki)
         return cur.lastrowid
 
