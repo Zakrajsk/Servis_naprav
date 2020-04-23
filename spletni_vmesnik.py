@@ -1,4 +1,5 @@
 import bottle
+from model import Naprava
 
 bottle.TEMPLATE_PATH.insert(0,'views')
 
@@ -18,7 +19,10 @@ def opis_opreme():
 @bottle.post('/opis-naprave/')
 def opis_post():
     inventarna = bottle.request.forms['inventarna']
-    return bottle.template('opis_naprave.html', inventarna=inventarna)
+    return bottle.template(
+        'opis_naprave.html',
+        inventarna=inventarna,
+        naprava = Naprava.opis_naprave(inventarna))
 
 @bottle.get('/izpisi/')
 def izpisi():

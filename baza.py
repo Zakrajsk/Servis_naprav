@@ -102,6 +102,7 @@ class Naprava(Tabela):
                                     UNIQUE,
                 dobavitelj   TEXT REFERENCES Podjetje (naziv),
                 dobava       DATE,
+                serviser     TEXT REFERENCES Podjetje (naziv),
                 stroskovno   TEXT    REFERENCES Stroskovno_mesto (oznaka),
                 rlp          INTEGER CHECK (RLP IN (12, 18, 24))
             );
@@ -333,7 +334,6 @@ class Popravilo(Tabela):
                                     CHECK (tip IN ('RLP', 'Popravilo', 'Popravilo in RLP') ),
                 opis        TEXT,
                 naprava     INTEGER REFERENCES naprava (inventarna),
-                servis      TEXT REFERENCES podjetje (naziv),
                 aktivacija DATE NOT NULL,
                 sprejem DATE,
                 vrnitev DATE,
