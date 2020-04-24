@@ -1,5 +1,5 @@
 import bottle
-from model import Naprava
+from model import Naprava, Popravilo, Nahajanje
 
 bottle.TEMPLATE_PATH.insert(0,'views')
 
@@ -22,7 +22,10 @@ def opis_post():
     return bottle.template(
         'opis_naprave.html',
         inventarna=inventarna,
-        naprava = Naprava.opis_naprave(inventarna))
+        naprava = Naprava.opis_naprave(inventarna),
+        lokacija = Nahajanje.zadnja_lokacija(inventarna),
+        popravila = Popravilo.vrni_popravila(inventarna),
+        odtujenosti = Nahajanje.odtujenosti(inventarna))
 
 @bottle.get('/izpisi/')
 def izpisi():

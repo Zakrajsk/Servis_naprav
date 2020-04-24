@@ -102,7 +102,7 @@
         </div>
         <div class="field">
             <div class="field">
-                <label class="label">{{naprava.lokacija}}</label>
+                <label class="label">{{lokacija}}</label>
             </div>
         </div>
         <div class="field">
@@ -112,7 +112,7 @@
         </div>
         <div class="field">
             <div class="field">
-                <label class="label">{{naprava.skrbnik}}</label>
+                <label class="label">{{inventarna}}</label>
             </div>
         </div>
     </div>
@@ -130,14 +130,12 @@
                     </tr>
                 </thead>
                 <tbody>
+                    % for datum in odtujenosti:
                     <tr>
-                        <td>12.01.2020</td>
-                        <td>12.01.2020</td>
+                        <td>{{datum.od}}</td>
+                        <td>{{datum.do}}</td>
                     </tr>
-                    <tr>
-                        <td>12.01.2020</td>
-                        <td>12.01.2020</td>
-                    </tr>
+                    % end
                 </tbody>
             </table>
         </div>
@@ -206,20 +204,15 @@
             </tr>
         </thead>
         <tbody>
+            % for popravilo in popravila:
             <tr>
-                <td>12.01.2020</td>
-                <td>RLP</td>
-                <td>13.01.2020</td>
-                <td>25.01.2020</td>
-                <td>Obrabljeno desno kolo</td>
+                <td>{{popravilo.aktivacija}}</td>
+                <td>{{popravilo.tip}}</td>
+                <td>{{popravilo.sprejem}}</td>
+                <td>{{popravilo.vrnitev}}</td>
+                <td>{{popravilo.opis}}</td>
             </tr>
-            <tr>
-                <td>12.01.2020</td>
-                <td>RLP</td>
-                <td>13.01.2020</td>
-                <td>25.01.2020</td>
-                <td>Obrabljeno desno kolo</td>
-            </tr>
+            % end
         </tbody>
     </table>
 </div>

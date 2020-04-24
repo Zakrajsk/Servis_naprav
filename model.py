@@ -15,7 +15,7 @@ class Naprava:
     insert = naprava.dodajanje(["inventarna", "naziv", "tip"])
 
     def __init__(self, inventarna, naziv, tip=None, garancija=None, proizvajalec=None,
-                 serijska=None, stroskovno=None, dobavitelj=None, dobava=None, serviser=None, rlp=None, lokacija=None, skrbnik=None):
+                 serijska=None, stroskovno=None, dobavitelj=None, dobava=None, serviser=None, rlp=None):
         """
         Konstruktor naprave
         """
@@ -30,8 +30,6 @@ class Naprava:
         self.dobava = dobava
         self.serviser = serviser
         self.rlp = rlp
-        self.lokacija = lokacija
-        self.skrbnik = skrbnik
     
     @staticmethod
     def opis_naprave(inventarna):
@@ -49,24 +47,106 @@ class Naprava:
                 naprava.dobavitelj,
                 naprava.dobava,
                 naprava.serviser,
-                naprava.rlp,
-                lokacija.oznaka AS lokacija,
-                oseba.ime AS skrbnik
+                naprava.rlp
             FROM naprava
-                JOIN
-                nahajanje ON naprava.inventarna = nahajanje.naprava
-                JOIN
-                lokacija ON nahajanje.lokacija = lokacija.id
-                JOIN
-                skrbnistvo ON naprava.inventarna = skrbnistvo.naprava
-                JOIN
-                oseba ON skrbnistvo.skrbnik = oseba.id
             WHERE inventarna = ?
         """
         cur.execute(sql, [inventarna])
-        #naziv, tip, garancija, proizvajalec, serijska, dobava, rlp = cur.fetchone()
-        test = cur.fetchone()
-        return Naprava(inventarna, *test)
+        rez = cur.fetchone()
+        return Naprava(inventarna, *rez)
         
 
+class Popravilo:
+    """
+    Razred za popravilo
+    """
+
+    insert = popravilo.dodajanje(["st_narocila", "tip", "opis", "naprava"])
+
+    def __init__(self, st_narocila=None, tip=None, opis=None, naprava=None, aktivacija=None, sprejem=None, vrnitev=None, zakljucek=None):
+        """
+        Konstruktor popravila
+        """
+        self.st_narocila = st_narocila
+        self.tip = tip
+        self.opis = opis
+        self.naprava = naprava
+        self.aktivacija = aktivacija
+        self.sprejem = sprejem
+        self.vrnitev = vrnitev
+        self.zakljucek = zakljucek
+
+    @staticmethod
+    def vrni_popravila(inventarna):
+        """
+        Vrne vsa popravila naprave z inventarno
+        """
+        sql = """
+            SELECT aktivacija,
+                tip,
+                sprejem,
+                vrnitev,
+                zakljucek,
+                opis
+            FROM popravilo
+            WHERE naprava = ?
+            ORDER BY substr(aktivacija, 7) || substr(aktivacija, 4, 2) || substr(aktivacija, 1, 2) DESC;
+        """
+        for aktivacija, tip, sprejem, vrnitev, zakljucek, opis in conn.execute(sql, [inventarna]):
+            yield Popravilo(aktivacija=aktivacija, tip=tip, sprejem=sprejem, vrnitev=vrnitev, zakljucek=zakljucek, opis=opis)
+
+
+class Nahajanje:
+    """
+    Razred za nahajanje
+    """
+
+    inset = nahajanje.dodajanje(["od", "do"])
+
+    def __init__(self, od=None, do=None, naprava=None, lokacija=None):
+        """
+        Konstruktor nahajanja
+        """
+        self.od = od
+        self.do = do
+        self.naprava = naprava
+        self.lokacija = lokacija
+
+    @staticmethod
+    def zadnja_lokacija(inventarna):
+        """
+        Vrne zadnjo lokacijo naprave z inventarno stevilo
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT lokacija.oznaka
+            FROM lokacija
+                JOIN
+                nahajanje ON lokacija.id = nahajanje.lokacija
+            WHERE nahajanje.naprava = ?
+            ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC
+            LIMIT 1;
+        """
+        cur.execute(sql, [inventarna])
+        rez = cur.fetchone()
+        return rez[0]
+        
+
+    @staticmethod
+    def odtujenosti(inventarna):
+        """
+        Vrne vse datume odtujenosti in vrnitve
+        """
+        sql = """
+            SELECT nahajanje.od,
+                nahajanje.[do]
+            FROM nahajanje
+                JOIN
+                lokacija ON nahajanje.lokacija = lokacija.id
+            WHERE naprava = ? AND 
+                lokacija.oznaka = "ODTUJENA"
+            ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC;
+        """
+        for od, do in conn.execute(sql, [inventarna]):
+            yield Nahajanje(od, do)
     
