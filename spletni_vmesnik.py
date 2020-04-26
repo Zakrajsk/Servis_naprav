@@ -1,5 +1,5 @@
 import bottle
-from model import Naprava, Popravilo, Nahajanje
+from model import Naprava, Popravilo, Nahajanje, Oseba
 
 bottle.TEMPLATE_PATH.insert(0,'views')
 
@@ -24,6 +24,7 @@ def opis_post():
         inventarna=inventarna,
         naprava = Naprava.opis_naprave(inventarna),
         lokacija = Nahajanje.zadnja_lokacija(inventarna),
+        skrbnik = Oseba.zadnji_skrbnik(inventarna),
         popravila = Popravilo.vrni_popravila(inventarna),
         odtujenosti = Nahajanje.odtujenosti(inventarna))
 
@@ -43,7 +44,11 @@ def aktiviraj_postopek():
 @bottle.post('/aktivacija-postopka/')
 def aktiviraj_postopek_post():
     inventarna = bottle.request.forms['inventarna']
-    return bottle.template('aktivacija_postopka.html', inventarna=inventarna)
+    return bottle.template(
+        'aktivacija_postopka.html',
+        inventarna=inventarna,
+        naziv = Naprava.vrni_naziv(inventarna),
+        lokacija = Nahajanje.zadnja_lokacija(inventarna))
 
 @bottle.get('/prevzem/')
 def prevzem():

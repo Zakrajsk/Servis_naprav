@@ -54,6 +54,21 @@ class Naprava:
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
         return Naprava(inventarna, *rez)
+
+    @staticmethod
+    def vrni_naziv(inventarna):
+        """
+        Vrne naziv naprave
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT naprava.naziv
+            FROM naprava
+            WHERE inventarna = ?
+        """
+        cur.execute(sql, [inventarna])
+        rez = cur.fetchone()
+        return rez[0]
         
 
 class Popravilo:
@@ -90,7 +105,7 @@ class Popravilo:
                 opis
             FROM popravilo
             WHERE naprava = ?
-            ORDER BY substr(aktivacija, 7) || substr(aktivacija, 4, 2) || substr(aktivacija, 1, 2) DESC;
+            ORDER BY substr(aktivacija, 7) || substr(aktivacija, 4, 2) || substr(aktivacija, 1, 2) DESC
         """
         for aktivacija, tip, sprejem, vrnitev, zakljucek, opis in conn.execute(sql, [inventarna]):
             yield Popravilo(aktivacija=aktivacija, tip=tip, sprejem=sprejem, vrnitev=vrnitev, zakljucek=zakljucek, opis=opis)
@@ -125,7 +140,7 @@ class Nahajanje:
                 nahajanje ON lokacija.id = nahajanje.lokacija
             WHERE nahajanje.naprava = ?
             ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC
-            LIMIT 1;
+            LIMIT 1
         """
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
@@ -145,8 +160,45 @@ class Nahajanje:
                 lokacija ON nahajanje.lokacija = lokacija.id
             WHERE naprava = ? AND 
                 lokacija.oznaka = "ODTUJENA"
-            ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC;
+            ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC
         """
         for od, do in conn.execute(sql, [inventarna]):
             yield Nahajanje(od, do)
+
+
+class Oseba:
+    """
+    Razred za osebo
+    """
+
+    insert = oseba.dodajanje(["ime"])
+
+    def __init__(self, ime, telefon=None, email=None):
+        """
+        Konstruktor osebe
+        """
+        self.ime = ime
+        self.telefon = telefon
+        self.email = email
+
+    @staticmethod
+    def zadnji_skrbnik(inventarna):
+        """
+        Vrne zadnjega skrbnika naprave z inventarno
+        """
+        cur = conn.cursor()
+        sql = """
+        SELECT oseba.ime
+        FROM oseba
+            JOIN
+            skrbnistvo ON oseba.id = skrbnistvo.skrbnik
+        WHERE skrbnistvo.naprava = ?
+        ORDER BY substr(skrbnistvo.od, 7) || substr(skrbnistvo.od, 4, 2) || substr(skrbnistvo.od, 1, 2) DESC
+        LIMIT 1
+        """
+        cur.execute(sql, [inventarna])
+        rez = cur.fetchone()
+        return rez[0]
+
+
     
