@@ -1,5 +1,5 @@
 import bottle
-from model import Naprava, Popravilo, Nahajanje, Oseba
+from model import Naprava, Popravilo, Nahajanje, Oseba, Datum
 
 bottle.TEMPLATE_PATH.insert(0,'views')
 
@@ -18,7 +18,7 @@ def opis_opreme():
 
 @bottle.post('/opis-naprave/')
 def opis_post():
-    inventarna = bottle.request.forms['inventarna']
+    inventarna = bottle.request.forms.get('inventarna')
     return bottle.template(
         'opis_naprave.html',
         inventarna=inventarna,
@@ -34,21 +34,35 @@ def izpisi():
 
 @bottle.post('/izpisi/')
 def izpisi_post():
-    tip_izpisa = bottle.request.forms['tip_izpisa']
+    tip_izpisa = bottle.request.forms.get('tip_izpisa')
     return bottle.template('izpis.html', tip_izpisa=tip_izpisa)
 
 @bottle.get('/aktivacija-postopka/')
 def aktiviraj_postopek():
-    return bottle.template('aktivacija_postopka.html', inventarna=None)
+    return bottle.template('aktivacija_postopka.html', inventarna="")
 
 @bottle.post('/aktivacija-postopka/')
 def aktiviraj_postopek_post():
-    inventarna = bottle.request.forms['inventarna']
-    return bottle.template(
-        'aktivacija_postopka.html',
-        inventarna=inventarna,
-        naziv = Naprava.vrni_naziv(inventarna),
-        lokacija = Nahajanje.zadnja_lokacija(inventarna))
+    if bottle.request.forms.get('iskanje_naprave'):
+        inventarna = bottle.request.forms.get('inventarna')
+        return bottle.template(
+            'aktivacija_postopka.html',
+            inventarna=inventarna,
+            naziv = Naprava.vrni_naziv(inventarna),
+            lokacija = Nahajanje.zadnja_lokacija(inventarna))
+    elif bottle.request.forms.get('potrditev_sprememb'):
+        podatki = bottle.request.forms
+        inventarna = podatki.get('inventarna')
+        st_narocila = podatki.get('st_narocila')
+        opis_napake = podatki.get('opis_napake')
+        tip = podatki.get('tip')
+        dan = podatki.get('dan')
+        mesec = podatki.get('mesec')
+        leto = podatki.get('leto')
+        datum = Datum.pretvori_v_niz(dan, mesec, leto)
+        Popravilo.dodaj_popravilo(st_narocila, tip, opis_napake, inventarna, datum)
+        return bottle.template('zacetna_stran.html')
+    
 
 @bottle.get('/prevzem/')
 def prevzem():
@@ -56,7 +70,7 @@ def prevzem():
 
 @bottle.post('/prevzem/')
 def prevzem_post():
-    inventarna = bottle.request.forms['inventarna']
+    inventarna = bottle.request.forms.get('inventarna')
     return bottle.template('prevzem.html', inventarna=inventarna)
 
 @bottle.get('/vrnitev/')
@@ -65,7 +79,7 @@ def vrnitev():
 
 @bottle.post('/vrnitev/')
 def vrnitev_post():
-    inventarna = bottle.request.forms['inventarna']
+    inventarna = bottle.request.forms.get('inventarna')
     return bottle.template('vrnitev.html', inventarna=inventarna)
 
 @bottle.get('/zakljucek/')
@@ -74,7 +88,7 @@ def zakljuci():
 
 @bottle.post('/zakljucek/')
 def zakluci_post():
-    inventarna = bottle.request.forms['inventarna']
+    inventarna = bottle.request.forms.get('inventarna')
     return bottle.template('zakljuci.html', inventarna=inventarna)
 
 @bottle.get('/aktivirane-naprave/')
@@ -95,7 +109,7 @@ def odtujen():
 
 @bottle.post('/odtujen/')
 def odtujen_post():
-    inventarna = bottle.request.forms['inventarna']
+    inventarna = bottle.request.forms.get('inventarna')
     return bottle.template('odtujen.html', inventarna=inventarna)
 
 @bottle.get('/odpis/')
@@ -104,7 +118,7 @@ def odpis():
 
 @bottle.post('/odpis/')
 def odpis_post():
-    inventarna = bottle.request.forms['inventarna']
+    inventarna = bottle.request.forms.get('inventarna')
     return bottle.template('odpis.html', inventarna=inventarna)
 
 

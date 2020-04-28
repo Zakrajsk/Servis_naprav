@@ -109,6 +109,10 @@ class Popravilo:
         """
         for aktivacija, tip, sprejem, vrnitev, zakljucek, opis in conn.execute(sql, [inventarna]):
             yield Popravilo(aktivacija=aktivacija, tip=tip, sprejem=sprejem, vrnitev=vrnitev, zakljucek=zakljucek, opis=opis)
+    
+    @staticmethod
+    def dodaj_popravilo(st_narocila, tip, opis, naprava, aktivacija):
+        print(st_narocila, tip, opis, naprava, aktivacija)
 
 
 class Nahajanje:
@@ -199,6 +203,29 @@ class Oseba:
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
         return rez[0]
+
+
+class Datum():
+    """
+    Razred za delo z datumi
+    """
+
+    def __init__(self, dan, mesec, leto):
+        """
+        Konstruktor za datum
+        """
+        self.dan = dan
+        self.mesec = mesec
+        self.leto = leto
+
+    @staticmethod
+    def pretvori_v_niz(dan, mesec, leto):
+        """
+        Pretvori datum v niz za v bazo v format dd.mm.yyyy
+        """
+        niz_dan = dan if int(dan) >= 10 else ('0' + dan)
+        niz_mesec = mesec if int(mesec) >= 10 else ('0' + mesec)
+        return '.'.join([niz_dan, niz_mesec, leto])
 
 
     
