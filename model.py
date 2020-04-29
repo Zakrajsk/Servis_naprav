@@ -5,7 +5,7 @@ conn = sqlite3.connect('naprave.db')
 baza.ustvari_bazo_ce_ne_obstaja(conn)
 conn.execute('PRAGMA foreign_keys = ON')
 
-stroskovno_mesto, naprava, podjetje, oseba, skrbnistvo, lokacija, nahajanje, popravilo = baza.pripravi_tabele(conn)
+stroskovno_mesto, naprava, podjetje, oseba, skrbnistvo, lokacija, nahajanje, popravilo, faza = baza.pripravi_tabele(conn)
 
 class Naprava:
     """
@@ -75,10 +75,7 @@ class Popravilo:
     """
     Razred za popravilo
     """
-
-    insert = popravilo.dodajanje(["st_narocila", "tip", "opis", "naprava"])
-
-    def __init__(self, st_narocila=None, tip=None, opis=None, naprava=None, aktivacija=None, sprejem=None, vrnitev=None, zakljucek=None):
+    def __init__(self, st_narocila, tip, opis, naprava):
         """
         Konstruktor popravila
         """
@@ -86,33 +83,69 @@ class Popravilo:
         self.tip = tip
         self.opis = opis
         self.naprava = naprava
-        self.aktivacija = aktivacija
-        self.sprejem = sprejem
-        self.vrnitev = vrnitev
-        self.zakljucek = zakljucek
 
     @staticmethod
     def vrni_popravila(inventarna):
         """
-        Vrne vsa popravila naprave z inventarno
+        Vrne vsa popravila naprave z inventarno za opis naprave
         """
         sql = """
-            SELECT aktivacija,
-                tip,
-                sprejem,
-                vrnitev,
-                zakljucek,
-                opis
+            SELECT popravilo.st_narocila,
+                popravilo.tip,
+                popravilo.opis,
+                faza.datum as aktivacija
             FROM popravilo
-            WHERE naprava = ?
+                JOIN 
+                faza ON popravilo.st_narocila = faza.popravilo
+            WHERE popravilo.naprava = ? AND faza.stopnja = 'aktivacija'
             ORDER BY substr(aktivacija, 7) || substr(aktivacija, 4, 2) || substr(aktivacija, 1, 2) DESC
         """
-        for aktivacija, tip, sprejem, vrnitev, zakljucek, opis in conn.execute(sql, [inventarna]):
-            yield Popravilo(aktivacija=aktivacija, tip=tip, sprejem=sprejem, vrnitev=vrnitev, zakljucek=zakljucek, opis=opis)
+        for st_narocila, tip, opis, aktivacija in conn.execute(sql, [inventarna]):
+            yield {'tip': tip, 'opis': opis, 'aktivacija': aktivacija,
+            'sprejem': Faza.datum_stopnje('sprejem', st_narocila),
+            'vrnitev': Faza.datum_stopnje('vrnitev', st_narocila)}
     
+    def dodaj_v_bazo(self):
+        insert = popravilo.dodajanje(["st_narocila", "tip", "opis", "naprava"])
+        with conn:
+            popravilo.dodaj_vrstico([self.st_narocila, self.tip, self.opis, self.naprava], insert)
+
+
+class Faza:
+    """
+    Razred za fazo
+    """
+    def __init__(self, datum, stopnja, popravilo):
+        """
+        Konstruktor faze
+        """
+        self.datum = datum
+        self.stopnja = stopnja
+        self.popravilo = popravilo
+        
     @staticmethod
-    def dodaj_popravilo(st_narocila, tip, opis, naprava, aktivacija):
-        print(st_narocila, tip, opis, naprava, aktivacija)
+    def datum_stopnje(stopnja, popravilo):
+        """
+        Vrne datum stopnje popravilo
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT datum
+            FROM faza
+            WHERE popravilo = ? AND stopnja = ?
+        """
+        cur.execute(sql, [popravilo, stopnja])
+        rez = cur.fetchone()
+        return '' if rez == None else rez[0]
+
+    def dodaj_v_bazo(self):
+        """
+        V bazo doda novo stopnjo popravila z dolocenim datumom
+        """
+        insert = faza.dodajanje(['datum', 'stopnja', 'popravilo'])
+        with conn:
+            faza.dodaj_vrstico([self.datum, self.stopnja, self.popravilo])
+
 
 
 class Nahajanje:
@@ -167,6 +200,8 @@ class Nahajanje:
             ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC
         """
         for od, do in conn.execute(sql, [inventarna]):
+            if do == None:
+                do = ''
             yield Nahajanje(od, do)
 
 

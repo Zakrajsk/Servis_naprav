@@ -169,8 +169,8 @@ class Podjetje(Tabela):
     """
     Tabela za podjetja
     """
-    ime="podjetje"
-    podatki="podatki/podjetja.csv"
+    ime = "podjetje"
+    podatki = "podatki/podjetja.csv"
 
     def ustvari(self):
         """
@@ -189,8 +189,8 @@ class Oseba(Tabela):
     """
     Tabela za osebe
     """
-    ime="oseba"
-    podatki="podatki/osebe.csv"
+    ime = "oseba"
+    podatki = "podatki/osebe.csv"
 
     def ustvari(self):
         """
@@ -210,8 +210,8 @@ class Skrbnistvo(Tabela):
     """
     Tabela za podatke o skrbnistvu
     """
-    ime="skrbnistvo"
-    podatki="podatki/skrbnistva.csv"
+    ime = "skrbnistvo"
+    podatki = "podatki/skrbnistva.csv"
 
     def ustvari(self):
         """
@@ -232,7 +232,7 @@ class Lokacija(Tabela):
     """
     Tabela za podatko lokacij
     """
-    ime="lokacija"
+    ime = "lokacija"
     
     def ustvari(self):
         """
@@ -320,24 +320,44 @@ class Popravilo(Tabela):
     """
     Tabela za popravila
     """
-    ime="popravilo"
-    podatki="podatki/popravila.csv"
+    ime = "popravilo"
+    podatki = "podatki/popravila.csv"
 
     def ustvari(self):
         """
-        Ustvari tabelo popravila
+        Ustvari tabelo popravilo
         """
         self.conn.execute("""
             CREATE TABLE popravilo (
                 st_narocila INTEGER PRIMARY KEY,
                 tip         TEXT    NOT NULL
-                                    CHECK (tip IN ('RLP', 'Popravilo', 'Popravilo in RLP') ),
+                                    CHECK (tip IN ('RLP', 'Popravilo', 'RLP in popravilo') ),
                 opis        TEXT,
-                naprava     INTEGER REFERENCES naprava (inventarna),
-                aktivacija DATE NOT NULL,
-                sprejem DATE,
-                vrnitev DATE,
-                zakljucek DATE
+                naprava     INTEGER REFERENCES naprava (inventarna)
+            );
+        """)
+
+
+class Faza(Tabela):
+    """
+    Tabela za faze
+    """
+    ime = "faza"
+    podatki = "podatki/faze.csv"
+
+    def ustvari(self):
+        """
+        Ustvari tabelo faze
+        """
+        self.conn.execute("""
+            CREATE TABLE faza (
+                datum DATE,
+                stopnja TEXT CHECK (stopnja IN ('aktivacija', 'sprejem', 'vrnitev', 'zakljuceno') ),
+                popravilo INTEGER REFERENCES Popravilo (St_narocila),
+                PRIMARY KEY (
+                    popravilo,
+                    stopnja
+                )
             );
         """)
 
@@ -391,7 +411,8 @@ def pripravi_tabele(conn):
     lokacija = Lokacija(conn)
     nahajanje = Nahajanje(conn, lokacija)
     popravilo = Popravilo(conn)
-    return [stroskovno_mesto, naprava, podjetje, oseba, skrbnistvo, lokacija, nahajanje, popravilo]
+    faza = Faza(conn)
+    return [stroskovno_mesto, naprava, podjetje, oseba, skrbnistvo, lokacija, nahajanje, popravilo, faza]
 
 def ustvari_bazo_ce_ne_obstaja(conn):
     """

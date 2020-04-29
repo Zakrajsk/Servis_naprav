@@ -30,146 +30,141 @@
     </div>
 
 %if inventarna:
-<form method="POST">
-<div class="column is-8">
-    <div class="field is-horizontal">
-        <div class="field-label">
-            <label class="label">Naziv</label>
+    <div class="column is-8">
+        <div class="field is-horizontal">
+            <div class="field-label">
+                <label class="label">Naziv</label>
+            </div>
+            <div class="field-body">
+                <label class="label">{{naziv}}</label>
+            </div>
         </div>
-        <div class="field-body">
-            <label class="label">{{naziv}}</label>
+        <div class="field is-horizontal">
+            <div class="field-label">
+                <label class="label">Lokacija</label>
+            </div>
+            <div class="field-body">
+                <label class="label">{{lokacija}}</label>
+            </div>
         </div>
-    </div>
-    <div class="field is-horizontal">
-        <div class="field-label">
-            <label class="label">Lokacija</label>
-        </div>
-        <div class="field-body">
-            <label class="label">{{lokacija}}</label>
-        </div>
-    </div>
 
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Datum aktivacije</label>
-        </div>
-        <div class="field-body">
-            <div class="select">
-                <select id="select_dan" name="dan">
-                </select>
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Datum aktivacije</label>
             </div>
-            <div class="select">
-                <select id="select_mesec" name="mesec">
-                </select>
-            </div>
-            <div class="select">
-                <select id="select_leto" name="leto">
-                </select>
-            </div>
-        </div>
-    </div>
-    <div class="field is-horizontal">
-        <div class="field-label">
-        <label class="label"></label>
-        </div>
-        <div class="field-body">
-            <div class="field is-narrow">
-                <div class="control">
-                    <label class="radio">
-                        <input type="radio" name="tip" value="RLP">
-                        RLP
-                    </label>
-                    <label class="radio">
-                        <input type="radio" name="tip" value="Popravilo">
-                        Popravilo
-                    </label>
-                    <label class="radio">
-                        <input type="radio" name="tip" value="RLP in popravilo">
-                        RLP in popravilo
-                    </label>
+            <div class="field-body">
+                <div class="select">
+                    <select id="select_dan" name="dan">
+                    </select>
+                </div>
+                <div class="select">
+                    <select id="select_mesec" name="mesec">
+                    </select>
+                </div>
+                <div class="select">
+                    <select id="select_leto" name="leto">
+                    </select>
                 </div>
             </div>
         </div>
+        <div class="field is-horizontal">
+            <div class="field-label">
+            <label class="label"></label>
+            </div>
+            <div class="field-body">
+                <div class="field is-narrow">
+                    <div class="control">
+                        <label class="radio">
+                            <input type="radio" name="tip" value="RLP">
+                            RLP
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="tip" value="Popravilo">
+                            Popravilo
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="tip" value="RLP in popravilo">
+                            RLP in popravilo
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Št naročila</label>
+            </div>
+            <div class="field-body has-addons">
+                <p class="control"><input class="input" type="text" name="st_narocila"></p>
+            </div>
+        </div>
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Opis napake</label>
+            </div>
+            <div class="field-body">
+                <input class="input" type="text" name="opis_napake">
+            </div>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-offset-6">
+            <input class="button is-primary is-large" type="submit" value="Aktiviraj postopek" name="potrditev_sprememb"></input>
+        </div>
     </div>
 
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Št naročila</label>
-        </div>
-        <div class="field-body has-addons">
-            <p class="control"><input class="input" type="text" name="st_narocila"></p>
-        </div>
-    </div>
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Opis napake</label>
-        </div>
-        <div class="field-body">
-            <input class="input" type="text" name="opis_napake">
-        </div>
-    </div>
-</div>
-<div class="columns">
-    <div class="column is-offset-6">
-        <input class="button is-primary is-large" type="submit" value="Aktiviraj postopek" name="potrditev_sprememb"></input>
-    </div>
-</div>
+    <script>
+        function posodobi_dneve(selectElement) {
+            var i, L = selectElement.options.length - 1;
+            for(i = L; i >= 0; i--) 
+                selectElement.remove(i);
+        
+            mesec = document.getElementById("select_mesec").value;
+            leto = document.getElementById("select_leto").value;
 
-
-<script>
-    function posodobi_dneve(selectElement) {
-        var i, L = selectElement.options.length - 1;
-        for(i = L; i >= 0; i--) 
-            selectElement.remove(i);
-    
-        mesec = document.getElementById("select_mesec").value;
-        leto = document.getElementById("select_leto").value;
-
-        if (mesec == 2)
-            if (((leto % 4 == 0) && (leto % 100 != 0)) || (leto % 400 == 0))
-                st_dni = 29;
+            if (mesec == 2)
+                if (((leto % 4 == 0) && (leto % 100 != 0)) || (leto % 400 == 0))
+                    st_dni = 29;
+                else
+                    st_dni = 28;
             else
-                st_dni = 28;
-        else
-            if (["2", "4", "6", "9", "11"].includes(mesec))
-                st_dni = 30;
-            else
-                st_dni = 31;
-    
-        for (var i = 1; i <= st_dni; i++)
-            selectElement.options[selectElement.options.length] = new Option(i, i);
-    }
+                if (["2", "4", "6", "9", "11"].includes(mesec))
+                    st_dni = 30;
+                else
+                    st_dni = 31;
+        
+            for (var i = 1; i <= st_dni; i++)
+                selectElement.options[selectElement.options.length] = new Option(i, i);
+        }
 
-    n = new Date();
-    leto = n.getFullYear();
-    mesec = n.getMonth() + 1;
-    dan = n.getDate();
+        n = new Date();
+        leto = n.getFullYear();
+        mesec = n.getMonth() + 1;
+        dan = n.getDate();
 
-    select_dan = document.getElementById("select_dan");
-    select_mesec = document.getElementById("select_mesec");
-    select_leto = document.getElementById("select_leto");
-    
-    for (var i = 1; i <= 12; i++)
-        select_mesec.options[select_mesec.options.length] = new Option(i, i);
+        select_dan = document.getElementById("select_dan");
+        select_mesec = document.getElementById("select_mesec");
+        select_leto = document.getElementById("select_leto");
+        
+        for (var i = 1; i <= 12; i++)
+            select_mesec.options[select_mesec.options.length] = new Option(i, i);
 
-    for (var i = 1980; i <= leto; i++)
-        select_leto.options[select_leto.options.length] = new Option(i, i);
+        for (var i = 1980; i <= leto; i++)
+            select_leto.options[select_leto.options.length] = new Option(i, i);
 
-    select_mesec.selectedIndex = mesec - 1;
-    select_leto.value = leto;
-    posodobi_dneve(select_dan);
-    select_dan.selectedIndex = dan - 1;
+        select_mesec.selectedIndex = mesec - 1;
+        select_leto.value = leto;
+        posodobi_dneve(select_dan);
+        select_dan.selectedIndex = dan - 1;
 
-    select_mesec.onchange = function(){
-        posodobi_dneve(select_dan)
-    }
-    
-    select_leto.onchange = function(){
-        posodobi_dneve(select_dan)
-    }
-</script>
+        select_mesec.onchange = function(){
+            posodobi_dneve(select_dan)
+        }
+        
+        select_leto.onchange = function(){
+            posodobi_dneve(select_dan)
+        }
+    </script>
 %end
-
-
-
 </form>

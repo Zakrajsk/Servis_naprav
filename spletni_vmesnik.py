@@ -1,5 +1,5 @@
 import bottle
-from model import Naprava, Popravilo, Nahajanje, Oseba, Datum
+from model import Naprava, Popravilo, Nahajanje, Oseba, Datum, Faza
 
 bottle.TEMPLATE_PATH.insert(0,'views')
 
@@ -50,6 +50,7 @@ def aktiviraj_postopek_post():
             inventarna=inventarna,
             naziv = Naprava.vrni_naziv(inventarna),
             lokacija = Nahajanje.zadnja_lokacija(inventarna))
+
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
         inventarna = podatki.get('inventarna')
@@ -60,18 +61,39 @@ def aktiviraj_postopek_post():
         mesec = podatki.get('mesec')
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
-        Popravilo.dodaj_popravilo(st_narocila, tip, opis_napake, inventarna, datum)
+        popravilo = Popravilo(st_narocila, tip, opis_napake, inventarna)
+        faza = Faza(datum, 'aktivacija', st_narocila)
+        popravilo.dodaj_v_bazo()
+        faza.dodaj_v_bazo()
+        
         return bottle.template('zacetna_stran.html')
     
 
 @bottle.get('/prevzem/')
 def prevzem():
-    return bottle.template('prevzem.html', inventarna=None)
+    return bottle.template('prevzem.html', inventarna="")
 
 @bottle.post('/prevzem/')
 def prevzem_post():
-    inventarna = bottle.request.forms.get('inventarna')
-    return bottle.template('prevzem.html', inventarna=inventarna)
+    if bottle.request.forms.get('iskanje_naprave'):
+        inventarna = bottle.request.forms.get('inventarna')
+        return bottle.template(
+            'prevzem.html',
+            inventarna=inventarna,
+            naziv = Naprava.vrni_naziv(inventarna),
+            lokacija = Nahajanje.zadnja_lokacija(inventarna))
+
+    elif bottle.request.forms.get('potrditev_sprememb'):
+        podatki = bottle.request.forms
+        inventarna = podatki.get('inventarna')
+        dan = podatki.get('dan')
+        mesec = podatki.get('mesec')
+        leto = podatki.get('leto')
+        datum = Datum.pretvori_v_niz(dan, mesec, leto)
+        faza = Faza(datum, 'prevzem', st_narocila)
+        faza.dodaj_v_bazo()
+        
+        return bottle.template('zacetna_stran.html')
 
 @bottle.get('/vrnitev/')
 def vrnitev():
