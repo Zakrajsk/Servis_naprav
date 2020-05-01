@@ -101,12 +101,36 @@ def prevzem_post():
 
 @bottle.get('/vrnitev/')
 def vrnitev():
-    return bottle.template('vrnitev.html', inventarna=None)
+    return bottle.template('vrnitev.html',
+                            inventarna="",
+                            napaka="")
 
 @bottle.post('/vrnitev/')
 def vrnitev_post():
-    inventarna = bottle.request.forms.get('inventarna')
-    return bottle.template('vrnitev.html', inventarna=inventarna)
+    if bottle.request.forms.get('iskanje_naprave'):
+        inventarna = bottle.request.forms.get('inventarna')
+        st, popravila = Popravilo.prevzeta_popravila(inventarna)
+        return bottle.template(
+            'vrnitev.html',
+            inventarna=inventarna,
+            naziv = Naprava.vrni_naziv(inventarna),
+            lokacija = Nahajanje.zadnja_lokacija(inventarna),
+            napaka = True if st == 0 else False)
+
+    elif bottle.request.forms.get('potrditev_sprememb'):
+        podatki = bottle.request.forms
+        inventarna = podatki.get('inventarna')
+        dan = podatki.get('dan')
+        mesec = podatki.get('mesec')
+        leto = podatki.get('leto')
+        datum = Datum.pretvori_v_niz(dan, mesec, leto)
+        st, popravilo = Popravilo.prevzeta_popravila(inventarna)
+        faza = Faza(datum, 'vrnitev', popravilo[0])
+        faza.dodaj_v_bazo()
+        if podatki.get('zakljucitev'):
+            koncna_faza = Faza(datum, 'zakljuceno', popravilo[0])
+            koncna_faza.dodaj_v_bazo()
+        return bottle.template('zacetna_stran.html')
 
 @bottle.get('/zakljucek/')
 def zakljuci():

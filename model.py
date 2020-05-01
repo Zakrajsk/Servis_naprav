@@ -129,6 +129,25 @@ class Popravilo:
             tabela_popravil.append(popravilo[0])
         return (len(tabela_popravil), tabela_popravil)
 
+    @staticmethod
+    def prevzeta_popravila(inventarna):
+        """
+        Vrne stevilo in tabelo vseh popravil, ki so bila prevzeta
+        """
+        tabela_popravil = list()
+        sql = """
+            SELECT faza.popravilo
+            FROM faza
+                JOIN
+                popravilo ON faza.popravilo = popravilo.st_narocila
+            WHERE popravilo.naprava = ?
+            GROUP BY faza.popravilo
+            HAVING count(faza.popravilo) = 2;
+        """
+        for popravilo in conn.execute(sql, [inventarna]):
+            tabela_popravil.append(popravilo[0])
+        return (len(tabela_popravil), tabela_popravil)
+
 
 class Faza:
     """
