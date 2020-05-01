@@ -11,6 +11,35 @@
 </section>
 <a href="/" class="button is-primary is-large">Nazaj</a>
 
+%if napaka:
+<div class="modal is-active" id='pop_up'>
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+            <div class="content">
+                <p>
+                <strong>Ups!</strong>
+                <br>
+                Naprava nima aktiviranega postopka.
+                </p>
+            </div>
+            <div>
+                <button class="button is-success" id='zapri'>Ok</button>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var pop_up = document.querySelector('#pop_up')
+    var zapri = document.querySelector('#zapri')
+    zapri.addEventListener('click', function(){
+        pop_up.classList.remove('is-active')
+    });
+</script>
+%end
+
+
 <form method="POST">
 
     <div class="columns is-gapless is-vcentered">
@@ -47,7 +76,8 @@
                 <label class="label">{{lokacija}}</label>
             </div>
         </div>
-
+   
+    % if not napaka:
         <div class="field is-horizontal">
             <div class="field-label is-normal">
                 <label class="label">Datum prevzema</label>
@@ -76,6 +106,7 @@
 
     <script>
         function posodobi_dneve(selectElement) {
+            trenutno_izbran_dan = selectElement.value;
             var i, L = selectElement.options.length - 1;
             for(i = L; i >= 0; i--) 
                 selectElement.remove(i);
@@ -96,6 +127,8 @@
         
             for (var i = 1; i <= st_dni; i++)
                 selectElement.options[selectElement.options.length] = new Option(i, i);
+            
+            selectElement.selectedIndex = trenutno_izbran_dan - 1
         }
 
         n = new Date();
@@ -126,6 +159,7 @@
             posodobi_dneve(select_dan)
         }
     </script>
-
+    %end
+    
 </form>
 %end

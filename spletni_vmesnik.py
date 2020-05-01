@@ -71,17 +71,21 @@ def aktiviraj_postopek_post():
 
 @bottle.get('/prevzem/')
 def prevzem():
-    return bottle.template('prevzem.html', inventarna="")
+    return bottle.template('prevzem.html',
+                            inventarna="",
+                            napaka="")
 
 @bottle.post('/prevzem/')
 def prevzem_post():
     if bottle.request.forms.get('iskanje_naprave'):
         inventarna = bottle.request.forms.get('inventarna')
+        st, popravila = Popravilo.aktivna_popravila(inventarna)
         return bottle.template(
             'prevzem.html',
             inventarna=inventarna,
             naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Nahajanje.zadnja_lokacija(inventarna))
+            lokacija = Nahajanje.zadnja_lokacija(inventarna),
+            napaka = True if st == 0 else False)
 
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
@@ -90,9 +94,9 @@ def prevzem_post():
         mesec = podatki.get('mesec')
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
-        faza = Faza(datum, 'prevzem', st_narocila)
+        st, popravilo = Popravilo.aktivna_popravila(inventarna)
+        faza = Faza(datum, 'sprejem', popravilo[0])
         faza.dodaj_v_bazo()
-        
         return bottle.template('zacetna_stran.html')
 
 @bottle.get('/vrnitev/')

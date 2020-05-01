@@ -116,6 +116,7 @@
 
     <script>
         function posodobi_dneve(selectElement) {
+            trenutno_izbran_dan = selectElement.value;
             var i, L = selectElement.options.length - 1;
             for(i = L; i >= 0; i--) 
                 selectElement.remove(i);
@@ -136,6 +137,8 @@
         
             for (var i = 1; i <= st_dni; i++)
                 selectElement.options[selectElement.options.length] = new Option(i, i);
+            
+            selectElement.selectedIndex = trenutno_izbran_dan - 1
         }
 
         n = new Date();

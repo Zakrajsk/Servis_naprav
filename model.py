@@ -110,6 +110,25 @@ class Popravilo:
         with conn:
             popravilo.dodaj_vrstico([self.st_narocila, self.tip, self.opis, self.naprava], insert)
 
+    @staticmethod
+    def aktivna_popravila(inventarna):
+        """
+        Vrne stevilo in tabelo vseh aktivnih popravil, ki so na stopnji aktivacije
+        """
+        tabela_popravil = list()
+        sql = """
+            SELECT faza.popravilo
+            FROM faza
+                JOIN
+                popravilo ON faza.popravilo = popravilo.st_narocila
+            WHERE popravilo.naprava = ?
+            GROUP BY faza.popravilo
+            HAVING count(faza.popravilo) = 1;
+        """
+        for popravilo in conn.execute(sql, [inventarna]):
+            tabela_popravil.append(popravilo[0])
+        return (len(tabela_popravil), tabela_popravil)
+
 
 class Faza:
     """
@@ -144,7 +163,7 @@ class Faza:
         """
         insert = faza.dodajanje(['datum', 'stopnja', 'popravilo'])
         with conn:
-            faza.dodaj_vrstico([self.datum, self.stopnja, self.popravilo])
+            faza.dodaj_vrstico([self.datum, self.stopnja, self.popravilo], insert)
 
 
 
