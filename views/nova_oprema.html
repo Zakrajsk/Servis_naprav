@@ -4,75 +4,117 @@
     <div class="hero-body">
         <div class="container has-text-centered">
             <h1 class="title is-1">
-                Servis naprav
+                Nova naprava
             </h1>
         </div>
     </div>
 </section>
 <a href="/" class="button is-primary is-large">Nazaj</a>
 
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Inventarna št</label>
-    </div>
-    <div class="field-body has-addons">
-        <p class="control"><input class="input" type="text" value=""></p>
-    </div>
-</div>
+<form method="POST">
 
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Naziv</label>
-    </div>
-    <div class="field-body">
-        <input class="input" type="text">
-    </div>
-</div>
-
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Tip</label>
-    </div>
-    <div class="field-body">
-        <div class="field is-horizontal">
-            <div class="field is-normal"></div>
-            <div class="field-body">
-                <input class="input" type="text">
-            </div>
-
-            <div class="field-label is-normal">
-                <label class="label">Serijska št</label>
-            </div>
-            <div class="field-body">
-                <input class="input" type="text">
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Inventarna št</label>
+        </div>
+        <div class="field-body has-addons">
+            <div class="field has-addons">
+                <p class="control">
+                    <a class="button is-static">
+                    74600
+                    </a>
+                </p>
+                <p class="control">
+                    <input class="input" type="text" name="inventarna">
+                </p>
             </div>
         </div>
     </div>
-</div>
 
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Proizvajalec</label>
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Naziv</label>
+        </div>
+        <div class="field-body">
+            <input class="input" type="text">
+        </div>
     </div>
-    <div class="field-body">
-        <input class="input" type="text">
-    </div>
-</div>
 
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Dobavitelj</label>
-    </div>
-    <div class="field-body">
-        <div class="field is-horizontal">
-            <div class="field is-normal"></div>
-            <div class="field-body">
-                <input class="input" type="text">
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Tip</label>
+        </div>
+        <div class="field-body">
+            <div class="field is-horizontal">
+                <div class="field is-normal"></div>
+                <div class="field-body">
+                    <input class="input" type="text">
+                </div>
+
+                <div class="field-label is-normal">
+                    <label class="label">Serijska št</label>
+                </div>
+                <div class="field-body">
+                    <input class="input" type="text">
+                </div>
             </div>
+        </div>
+    </div>
 
-            <div class="field-label is-normal">
-                <label class="label">Datum dobave</label>
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Proizvajalec</label>
+        </div>
+        <div class="field-body">
+            <input class="input" type="text">
+        </div>
+    </div>
+
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Dobavitelj</label>
+        </div>
+        <div class="field-body">
+            <div class="field is-horizontal">
+                <div class="field is-normal"></div>
+                <div class="field-body">
+                    <input class="input" type="text">
+                </div>
+
+                <div class="field-label is-normal">
+                    <label class="label">Datum dobave</label>
+                </div>
+                <div class="select">
+                    <select>
+                        <option>01</option>
+                        <option>02</option>
+                        <option>03</option>
+                    </select>
+                </div>
+                <div class="select">
+                    <select>
+                        <option>01</option>
+                        <option>02</option>
+                        <option>03</option>
+                    </select>
+                </div>
+                <div class="select">
+                    <select>
+                        <option>2016</option>
+                        <option>2017</option>
+                        <option>2018</option>
+                    </select>
+                </div>
             </div>
+        </div>
+    </div>
+
+
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Garancija do</label>
+        </div>
+        <div class="field-body">
             <div class="select">
                 <select>
                     <option>01</option>
@@ -96,93 +138,112 @@
             </div>
         </div>
     </div>
-</div>
 
-
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Garancija do</label>
-    </div>
-    <div class="field-body">
-        <div class="select">
-            <select>
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-            </select>
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Stroškovno mesto</label>
         </div>
-        <div class="select">
-            <select>
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-            </select>
-        </div>
-        <div class="select">
-            <select>
-                <option>2016</option>
-                <option>2017</option>
-                <option>2018</option>
-            </select>
-        </div>
-    </div>
-</div>
+        <div class="field-body">
+            <div class="field is-horizontal">
+                <div class="field is-normal"></div>
+                <div class="field-body">
+                    <input class="input" type="text">
+                </div>
 
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Stroškovno mesto</label>
-    </div>
-    <div class="field-body">
-        <div class="field is-horizontal">
-            <div class="field is-normal"></div>
-            <div class="field-body">
-                <input class="input" type="text">
-            </div>
-
-            <div class="field-label is-normal">
-                <label class="label">Lokacija</label>
-            </div>
-            <div class="field-body">
-                <input class="input" type="text">
+                <div class="field-label is-normal">
+                    <label class="label">Lokacija</label>
+                </div>
+                <div class="field-body">
+                    <div class="select">
+                        <select name="lokacija" id="select_lokacija" name="lokacija">
+                            <option value='' selected disabled hidden></option>
+                            %for lokacija in lokacije:
+                            <option value="{{lokacija}}">{{lokacija}}</option>
+                            %end
+                        </select>
+                    </div>
+                    <button class="button is-primary" type="button" id="dodaj_lokacijo"><i class="far fa-plus-square fa-lg"></i></button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Skrbnik</label>
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Skrbnik</label>
+        </div>
+        <div class="field-body">
+            <input class="input" type="text">
+        </div>
     </div>
-    <div class="field-body">
-        <input class="input" type="text">
-    </div>
-</div>
 
-<div class="field is-horizontal">
-    <div class="field-label is-normal">
-        <label class="label">Serviser</label>
-    </div>
-    <div class="field-body">
-        <div class="field is-horizontal">
-            <div class="field is-normal"></div>
-            <div class="field-body">
-                <input class="input" type="text">
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Serviser</label>
+        </div>
+        <div class="field-body">
+            <div class="field is-horizontal">
+                <div class="field is-normal"></div>
+                <div class="field-body">
+                    <input class="input" type="text">
+                </div>
+
+                <div class="field-label is-normal">
+                    <label class="label">Redni letni pregled</label>
+                </div>
+                <div class="select">
+                    <select>
+                        <option>12</option>
+                        <option>18</option>
+                        <option>24</option>
+                    </select>
+                </div>
             </div>
+        </div>
+    </div>
 
-            <div class="field-label is-normal">
-                <label class="label">Redni letni pregled</label>
-            </div>
-            <div class="select">
-                <select>
-                    <option>12</option>
-                    <option>18</option>
-                    <option>24</option>
-                </select>
+    <div class="field">
+        <button class="button is-primary is-large is-pulled-right">Potrdi</button>
+    </div>
+</div>
+</form>
+
+<div class="modal" id='obrazec_lokacija'>
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="column is-offset-3">
+            <div class="box">
+                <div class="field is-horizontal">
+                    <div class="field-label is-normal">
+                        <label class="label">Lokacija</label>
+                    </div>
+                    <div class="field-body has-addons">
+                        <p class="control"><input class="input" type="text" id="vnos_lokacije"></p>
+                    </div>
+                </div>
+                <div>
+                    <button class="button is-success" type="button" id='potrdi'>Potrdi</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+    var prikaz = document.querySelector('#dodaj_lokacijo');
+    var obrazec = document.querySelector('#obrazec_lokacija');
+    var zapri = document.querySelector('#potrdi');
 
-<div class="field">
-    <button class="button is-primary is-large is-pulled-right">Potrdi</button>
-</div>
+
+    prikaz.addEventListener('click', function(){
+        obrazec.classList.add('is-active')
+    });
+    
+    zapri.addEventListener('click', function(){
+        var vnesena_lokacija = document.getElementById('vnos_lokacije').value;
+        obrazec.classList.remove('is-active')
+        var select_lokacija = document.getElementById('select_lokacija');
+        select_lokacija.options[select_lokacija.options.length] = new Option(vnesena_lokacija, vnesena_lokacija)
+        select_lokacija.value = vnesena_lokacija
+        
+    });
+</script>

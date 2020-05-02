@@ -148,18 +148,37 @@ class Popravilo:
             tabela_popravil.append(popravilo[0])
         return (len(tabela_popravil), tabela_popravil)
 
+    @staticmethod
+    def vrnjena_popravila(inventarna):
+        """
+        Vrne stevilo in tabelo vseh popravil, ki so bila prevzeta
+        """
+        tabela_popravil = list()
+        sql = """
+            SELECT faza.popravilo
+            FROM faza
+                JOIN
+                popravilo ON faza.popravilo = popravilo.st_narocila
+            WHERE popravilo.naprava = ?
+            GROUP BY faza.popravilo
+            HAVING count(faza.popravilo) = 3;
+        """
+        for popravilo in conn.execute(sql, [inventarna]):
+            tabela_popravil.append(popravilo[0])
+        return (len(tabela_popravil), tabela_popravil)
+
 
 class Faza:
     """
     Razred za fazo
     """
-    def __init__(self, datum, stopnja, popravilo):
+    def __init__(self, stopnja, popravilo, datum=None):
         """
         Konstruktor faze
         """
-        self.datum = datum
         self.stopnja = stopnja
         self.popravilo = popravilo
+        self.datum = datum
         
     @staticmethod
     def datum_stopnje(stopnja, popravilo):
@@ -203,26 +222,6 @@ class Nahajanje:
         self.lokacija = lokacija
 
     @staticmethod
-    def zadnja_lokacija(inventarna):
-        """
-        Vrne zadnjo lokacijo naprave z inventarno stevilo
-        """
-        cur = conn.cursor()
-        sql = """
-            SELECT lokacija.oznaka
-            FROM lokacija
-                JOIN
-                nahajanje ON lokacija.id = nahajanje.lokacija
-            WHERE nahajanje.naprava = ?
-            ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC
-            LIMIT 1
-        """
-        cur.execute(sql, [inventarna])
-        rez = cur.fetchone()
-        return rez[0]
-        
-
-    @staticmethod
     def odtujenosti(inventarna):
         """
         Vrne vse datume odtujenosti in vrnitve
@@ -241,6 +240,53 @@ class Nahajanje:
             if do == None:
                 do = ''
             yield Nahajanje(od, do)
+
+
+class Lokacija:
+    """
+    Razred za lokacijo
+    """
+    def __init(self, oznaka):
+        """
+        Konstruktor lokacije
+        """
+        self.oznaka = oznaka
+
+    @staticmethod
+    def zadnja_lokacija(inventarna):
+        """
+        Vrne zadnjo lokacijo naprave z inventarno stevilo
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT lokacija.oznaka
+            FROM lokacija
+                JOIN
+                nahajanje ON lokacija.id = nahajanje.lokacija
+            WHERE nahajanje.naprava = ?
+            ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC
+            LIMIT 1
+        """
+        cur.execute(sql, [inventarna])
+        rez = cur.fetchone()
+        return rez[0]
+
+    @staticmethod
+    def seznam_lokacij():
+        """
+        Vrne seznam vseh lokacij v bazi
+        """
+        tabela_lokacij = list()
+        conn.cursor()
+        sql = """
+            SELECT oznaka
+            FROM lokacija
+            ORDER BY oznaka
+        """
+        for oznaka in conn.execute(sql):
+            tabela_lokacij.append(oznaka[0])
+        return tabela_lokacij
+
 
 
 class Oseba:

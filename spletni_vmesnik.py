@@ -1,5 +1,5 @@
 import bottle
-from model import Naprava, Popravilo, Nahajanje, Oseba, Datum, Faza
+from model import Naprava, Popravilo, Nahajanje, Oseba, Datum, Faza, Lokacija
 
 bottle.TEMPLATE_PATH.insert(0,'views')
 
@@ -10,7 +10,14 @@ def zacetna_stran():
 
 @bottle.get('/nova-oprema/')
 def nova_naprava():
-    return bottle.template('nova_oprema.html')
+    return bottle.template('nova_oprema.html',
+                            lokacije = Lokacija.seznam_lokacij())
+
+@bottle.post('/nova-oprema/')
+def nova_naprava_post():
+    podatki = bottle.request.forms
+    print(*podatki)
+    return bottle.template('zacetna_stran.html')
 
 @bottle.get('/opis-naprave/')
 def opis_opreme():
@@ -23,7 +30,7 @@ def opis_post():
         'opis_naprave.html',
         inventarna=inventarna,
         naprava = Naprava.opis_naprave(inventarna),
-        lokacija = Nahajanje.zadnja_lokacija(inventarna),
+        lokacija = Lokacija.zadnja_lokacija(inventarna),
         skrbnik = Oseba.zadnji_skrbnik(inventarna),
         popravila = Popravilo.vrni_popravila(inventarna),
         odtujenosti = Nahajanje.odtujenosti(inventarna))
@@ -62,7 +69,7 @@ def aktiviraj_postopek_post():
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
         popravilo = Popravilo(st_narocila, tip, opis_napake, inventarna)
-        faza = Faza(datum, 'aktivacija', st_narocila)
+        faza = Faza('aktivacija', st_narocila, datum)
         popravilo.dodaj_v_bazo()
         faza.dodaj_v_bazo()
         
@@ -95,7 +102,7 @@ def prevzem_post():
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
         st, popravilo = Popravilo.aktivna_popravila(inventarna)
-        faza = Faza(datum, 'sprejem', popravilo[0])
+        faza = Faza('sprejem', popravilo[0], datum)
         faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 
@@ -125,21 +132,38 @@ def vrnitev_post():
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
         st, popravilo = Popravilo.prevzeta_popravila(inventarna)
-        faza = Faza(datum, 'vrnitev', popravilo[0])
+        faza = Faza('vrnitev', popravilo[0], datum)
         faza.dodaj_v_bazo()
         if podatki.get('zakljucitev'):
-            koncna_faza = Faza(datum, 'zakljuceno', popravilo[0])
+            koncna_faza = Faza('zakljuceno', popravilo[0])
             koncna_faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 
 @bottle.get('/zakljucek/')
 def zakljuci():
-    return bottle.template('zakljuci.html', inventarna=None)
+    return bottle.template('zakljuci.html',
+                            inventarna="",
+                            napaka="")
 
 @bottle.post('/zakljucek/')
 def zakluci_post():
-    inventarna = bottle.request.forms.get('inventarna')
-    return bottle.template('zakljuci.html', inventarna=inventarna)
+    if bottle.request.forms.get('iskanje_naprave'):
+        inventarna = bottle.request.forms.get('inventarna')
+        st, popravila = Popravilo.vrnjena_popravila(inventarna)
+        return bottle.template(
+            'zakljuci.html',
+            inventarna=inventarna,
+            naziv = Naprava.vrni_naziv(inventarna),
+            lokacija = Nahajanje.zadnja_lokacija(inventarna),
+            napaka = True if st == 0 else False)
+
+    elif bottle.request.forms.get('potrditev_sprememb'):
+        podatki = bottle.request.forms
+        inventarna = podatki.get('inventarna')
+        st, popravilo = Popravilo.vrnjena_popravila(inventarna)
+        faza = Faza('zakljuceno', popravilo[0])
+        faza.dodaj_v_bazo()
+        return bottle.template('zacetna_stran.html')
 
 @bottle.get('/aktivirane-naprave/')
 def aktivirane_naprave():
