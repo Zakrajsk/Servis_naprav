@@ -36,7 +36,7 @@
             <label class="label">Naziv</label>
         </div>
         <div class="field-body">
-            <input class="input" type="text">
+            <input class="input" type="text" name="naziv">
         </div>
     </div>
 
@@ -48,14 +48,14 @@
             <div class="field is-horizontal">
                 <div class="field is-normal"></div>
                 <div class="field-body">
-                    <input class="input" type="text">
+                    <input class="input" type="text" name="tip">
                 </div>
 
                 <div class="field-label is-normal">
                     <label class="label">Serijska št</label>
                 </div>
                 <div class="field-body">
-                    <input class="input" type="text">
+                    <input class="input" type="text" name="serijska">
                 </div>
             </div>
         </div>
@@ -66,7 +66,30 @@
             <label class="label">Proizvajalec</label>
         </div>
         <div class="field-body">
-            <input class="input" type="text">
+            <div class="field is-horizontal">
+                <div class="field is-normal"></div>
+                <div class="field-body">
+                    <input class="input" type="text" name="proizvajalec">
+                </div>
+
+                <div class="field-label is-normal">
+                    <label class="label">Garancija</label>
+                </div>
+                <div class="field-body">
+                    <div class="select">
+                        <select id="select_dan_garancija" name="dan_garancija">
+                        </select>
+                    </div>
+                    <div class="select">
+                        <select id="select_mesec_garancija" name="mesec_garancija">
+                        </select>
+                    </div>
+                    <div class="select">
+                        <select id="select_leto_garancija" name="leto_garancija">
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -78,63 +101,34 @@
             <div class="field is-horizontal">
                 <div class="field is-normal"></div>
                 <div class="field-body">
-                    <input class="input" type="text">
+                    <div class="select is-fullwidth">
+                        <select id="select_dobavitelj" name="dobavitelj">
+                            <option value='' selected disabled hidden></option>
+                            %for podjetje in podjetja:
+                            <option value="{{podjetje}}">{{podjetje}}</option>
+                            %end
+                        </select>
+                    </div>
+                    <button class="button is-primary" type="button" id="dodaj_dobavitelj"><i class="far fa-plus-square fa-lg"></i></button>
                 </div>
 
                 <div class="field-label is-normal">
-                    <label class="label">Datum dobave</label>
+                    <label class="label">Dobava</label>
                 </div>
-                <div class="select">
-                    <select>
-                        <option>01</option>
-                        <option>02</option>
-                        <option>03</option>
-                    </select>
+                <div class="field-body">
+                    <div class="select">
+                        <select id="select_dan_dobava" name="dan_dobava">
+                        </select>
+                    </div>
+                    <div class="select">
+                        <select id="select_mesec_dobava" name="mesec_dobava">
+                        </select>
+                    </div>
+                    <div class="select">
+                        <select id="select_leto_dobava" name="leto_dobava">
+                        </select>
+                    </div>
                 </div>
-                <div class="select">
-                    <select>
-                        <option>01</option>
-                        <option>02</option>
-                        <option>03</option>
-                    </select>
-                </div>
-                <div class="select">
-                    <select>
-                        <option>2016</option>
-                        <option>2017</option>
-                        <option>2018</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Garancija do</label>
-        </div>
-        <div class="field-body">
-            <div class="select">
-                <select>
-                    <option>01</option>
-                    <option>02</option>
-                    <option>03</option>
-                </select>
-            </div>
-            <div class="select">
-                <select>
-                    <option>01</option>
-                    <option>02</option>
-                    <option>03</option>
-                </select>
-            </div>
-            <div class="select">
-                <select>
-                    <option>2016</option>
-                    <option>2017</option>
-                    <option>2018</option>
-                </select>
             </div>
         </div>
     </div>
@@ -147,7 +141,15 @@
             <div class="field is-horizontal">
                 <div class="field is-normal"></div>
                 <div class="field-body">
-                    <input class="input" type="text">
+                    <div class="select is-fullwidth">
+                        <select id="select_stroskovno" name="stroskovno">
+                            <option value='' selected disabled hidden></option>
+                            %for stroskovno in stroskovna:
+                            <option value="{{stroskovno}}">{{stroskovno}}</option>
+                            %end
+                        </select>
+                    </div>
+                    <button class="button is-primary" type="button" id="dodaj_stroskovno"><i class="far fa-plus-square fa-lg"></i></button>
                 </div>
 
                 <div class="field-label is-normal">
@@ -155,14 +157,14 @@
                 </div>
                 <div class="field-body">
                     <div class="select">
-                        <select name="lokacija" id="select_lokacija" name="lokacija">
+                        <select id="select_lokacija" name="lokacija">
                             <option value='' selected disabled hidden></option>
                             %for lokacija in lokacije:
                             <option value="{{lokacija}}">{{lokacija}}</option>
                             %end
                         </select>
                     </div>
-                    <button class="button is-primary" type="button" id="dodaj_lokacijo"><i class="far fa-plus-square fa-lg"></i></button>
+                    <button class="button is-primary" type="button" id="dodaj_lokacija"><i class="far fa-plus-square fa-lg"></i></button>
                 </div>
             </div>
         </div>
@@ -173,26 +175,40 @@
             <label class="label">Skrbnik</label>
         </div>
         <div class="field-body">
-            <input class="input" type="text">
-        </div>
-    </div>
-
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Serviser</label>
-        </div>
-        <div class="field-body">
             <div class="field is-horizontal">
                 <div class="field is-normal"></div>
                 <div class="field-body">
-                    <input class="input" type="text">
+                    <div class="select is-fullwidth">
+                        <select id="select_skrbnik" name="skrbnik">
+                            <option value='' selected disabled hidden></option>
+                            %for oseba in osebe:
+                            <option value="{{oseba}}">{{oseba}}</option>
+                            %end
+                        </select>
+                    </div>
+                    <button class="button is-primary" type="button" id="dodaj_skrbnik"><i class="far fa-plus-square fa-lg"></i></button>
                 </div>
 
                 <div class="field-label is-normal">
-                    <label class="label">Redni letni pregled</label>
+                    <label class="label">Serviser</label>
+                </div>
+                <div class="field-body">
+                    <div class="select is-fullwidth">
+                        <select id="select_serviser" name="serviser">
+                            <option value='' selected disabled hidden></option>
+                            %for podjetje in podjetja:
+                            <option value="{{podjetje}}">{{podjetje}}</option>
+                            %end
+                        </select>
+                    </div>
+                    <button class="button is-primary" type="button" id="dodaj_serviser"><i class="far fa-plus-square fa-lg"></i></button>
+                </div>
+                <div class="field-label is-normal">
+                    <label class="label">RLP</label>
                 </div>
                 <div class="select">
-                    <select>
+                    <select name="RLP">
+                        <option value='' selected disabled hidden></option>
                         <option>12</option>
                         <option>18</option>
                         <option>24</option>
@@ -201,49 +217,254 @@
             </div>
         </div>
     </div>
-
     <div class="field">
         <button class="button is-primary is-large is-pulled-right">Potrdi</button>
     </div>
-</div>
-</form>
 
-<div class="modal" id='obrazec_lokacija'>
-    <div class="modal-background"></div>
-    <div class="modal-content">
-        <div class="column is-offset-3">
-            <div class="box">
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">Lokacija</label>
+
+    <div class="modal" id='obrazec_dobavitelj'>
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="column is-offset-3">
+                <div class="box">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Naziv</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="vnos_dobavitelj"></p>
+                        </div>
                     </div>
-                    <div class="field-body has-addons">
-                        <p class="control"><input class="input" type="text" id="vnos_lokacije"></p>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Telefon</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="telefon_dobavitelj" name="telefon_dobavitelj"></p>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <button class="button is-success" type="button" id='potrdi'>Potrdi</button>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Email</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="email_dobavitelj" name="email_dobavitelj"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="button is-success" type="button" id='potrdi_dobavitelj'>Potrdi</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <div class="modal" id='obrazec_stroskovno'>
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="column is-offset-3">
+                <div class="box">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Stroškovno mesto</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="vnos_stroskovno"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="button is-success" type="button" id='potrdi_stroskovno'>Potrdi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id='obrazec_lokacija'>
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="column is-offset-3">
+                <div class="box">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Lokacija</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="vnos_lokacija"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="button is-success" type="button" id='potrdi_lokacija'>Potrdi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id='obrazec_skrbnik'>
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="column is-offset-3">
+                <div class="box">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Ime</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="vnos_skrbnik"></p>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Telefon</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="telefon_skrbnik" name="telefon_skrbnik"></p>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Email</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="email_skrbnik" name="email_skrbnik"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="button is-success" type="button" id='potrdi_skrbnik'>Potrdi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id='obrazec_serviser'>
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="column is-offset-3">
+                <div class="box">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Naziv</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="vnos_serviser"></p>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Telefon</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="telefon_serviser" name="telefon_serviser"></p>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Email</label>
+                        </div>
+                        <div class="field-body has-addons">
+                            <p class="control"><input class="input" type="text" id="email_serviser" name="email_serviser"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="button is-success" type="button" id='potrdi_serviser'>Potrdi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 <script>
-    var prikaz = document.querySelector('#dodaj_lokacijo');
-    var obrazec = document.querySelector('#obrazec_lokacija');
-    var zapri = document.querySelector('#potrdi');
 
-
-    prikaz.addEventListener('click', function(){
-        obrazec.classList.add('is-active')
-    });
-    
-    zapri.addEventListener('click', function(){
-        var vnesena_lokacija = document.getElementById('vnos_lokacije').value;
-        obrazec.classList.remove('is-active')
-        var select_lokacija = document.getElementById('select_lokacija');
-        select_lokacija.options[select_lokacija.options.length] = new Option(vnesena_lokacija, vnesena_lokacija)
-        select_lokacija.value = vnesena_lokacija
+    function napolni_datume(ime_podatkov){
         
-    });
+        var n = new Date();
+        var leto = n.getFullYear();
+        var mesec = n.getMonth() + 1;
+        var dan = n.getDate();
+
+        select_dan = document.getElementById("select_dan_" + ime_podatkov);
+        select_mesec = document.getElementById("select_mesec_" + ime_podatkov);
+        select_leto = document.getElementById("select_leto_" + ime_podatkov);
+        
+        for (var i = 1; i <= 12; i++)
+            select_mesec.options[select_mesec.options.length] = new Option(i, i);
+
+        for (var i = 1980; i <= leto; i++)
+            select_leto.options[select_leto.options.length] = new Option(i, i);
+
+        select_mesec.selectedIndex = mesec - 1;
+        select_leto.value = leto;
+        posodobi_dneve(select_dan, ime_podatkov);
+        select_dan.selectedIndex = dan - 1;
+
+        select_mesec.onchange = function(){
+            posodobi_dneve(select_dan, ime_podatkov);
+        }
+        
+        select_leto.onchange = function(){
+            posodobi_dneve(select_dan, ime_podatkov);
+        }
+    }
+
+    function posodobi_dneve(selectElement, ime_podatkov) {
+            trenutno_izbran_dan = selectElement.value;
+            var i, L = selectElement.options.length - 1;
+            for(i = L; i >= 0; i--) 
+                selectElement.remove(i);
+        
+            mesec = document.getElementById("select_mesec_" + ime_podatkov).value;
+            leto = document.getElementById("select_leto_" + ime_podatkov).value;
+
+            if (mesec == 2)
+                if (((leto % 4 == 0) && (leto % 100 != 0)) || (leto % 400 == 0))
+                    st_dni = 29;
+                else
+                    st_dni = 28;
+            else
+                if (["2", "4", "6", "9", "11"].includes(mesec))
+                    st_dni = 30;
+                else
+                    st_dni = 31;
+        
+            for (var i = 1; i <= st_dni; i++)
+                selectElement.options[selectElement.options.length] = new Option(i, i);
+            
+            selectElement.selectedIndex = trenutno_izbran_dan - 1
+        }
+
+    function odpri_obrazec(ime_obrazca){
+        var obrazec = document.querySelector('#obrazec_' + ime_obrazca);
+        obrazec.classList.add('is-active');
+    }
+
+    function potrdi_obrazec(ime_obrazca){
+        var obrazec = document.querySelector('#obrazec_' + ime_obrazca);
+        var vnos = document.getElementById('vnos_' + ime_obrazca).value;
+        var select = document.getElementById('select_' + ime_obrazca);
+        select.options[select.options.length] = new Option(vnos, vnos);
+        select.value = vnos;
+        obrazec.classList.remove('is-active');
+    }
+
+    function ustvari_eventlistener(ime, index){
+        var prikazi = document.querySelector('#dodaj_' + ime);
+        var zapri = document.querySelector('#potrdi_' + ime);
+
+        prikazi.addEventListener('click', function(){
+            odpri_obrazec(ime);
+        });
+
+        zapri.addEventListener('click', function(){
+            potrdi_obrazec(ime);
+        });
+    }
+
+    tabela_dodajanj = ['dobavitelj', 'stroskovno', 'lokacija', 'skrbnik', 'serviser'];
+    tabela_dodajanj.forEach(ustvari_eventlistener);
+
+    napolni_datume('garancija');
+    napolni_datume('dobava');
+
 </script>

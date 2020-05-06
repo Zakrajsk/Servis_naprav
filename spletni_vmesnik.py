@@ -1,5 +1,5 @@
 import bottle
-from model import Naprava, Popravilo, Nahajanje, Oseba, Datum, Faza, Lokacija
+from model import Naprava, Popravilo, Nahajanje, Oseba, Datum, Faza, Lokacija, Podjetje, Stroskovno
 
 bottle.TEMPLATE_PATH.insert(0,'views')
 
@@ -11,7 +11,10 @@ def zacetna_stran():
 @bottle.get('/nova-oprema/')
 def nova_naprava():
     return bottle.template('nova_oprema.html',
-                            lokacije = Lokacija.seznam_lokacij())
+                            lokacije = Lokacija.seznam_lokacij(),
+                            podjetja = Podjetje.seznam_vseh(),
+                            stroskovna = Stroskovno.seznam_vseh(),
+                            osebe = Oseba.seznam_vseh())
 
 @bottle.post('/nova-oprema/')
 def nova_naprava_post():
@@ -56,7 +59,7 @@ def aktiviraj_postopek_post():
             'aktivacija_postopka.html',
             inventarna=inventarna,
             naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Nahajanje.zadnja_lokacija(inventarna))
+            lokacija = Lokacija.zadnja_lokacija(inventarna))
 
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
@@ -91,7 +94,7 @@ def prevzem_post():
             'prevzem.html',
             inventarna=inventarna,
             naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Nahajanje.zadnja_lokacija(inventarna),
+            lokacija = Lokacija.zadnja_lokacija(inventarna),
             napaka = True if st == 0 else False)
 
     elif bottle.request.forms.get('potrditev_sprememb'):
@@ -121,7 +124,7 @@ def vrnitev_post():
             'vrnitev.html',
             inventarna=inventarna,
             naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Nahajanje.zadnja_lokacija(inventarna),
+            lokacija = Lokacija.zadnja_lokacija(inventarna),
             napaka = True if st == 0 else False)
 
     elif bottle.request.forms.get('potrditev_sprememb'):
@@ -154,7 +157,7 @@ def zakluci_post():
             'zakljuci.html',
             inventarna=inventarna,
             naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Nahajanje.zadnja_lokacija(inventarna),
+            lokacija = Lokacija.zadnja_lokacija(inventarna),
             napaka = True if st == 0 else False)
 
     elif bottle.request.forms.get('potrditev_sprememb'):

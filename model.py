@@ -322,9 +322,55 @@ class Oseba:
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
         return rez[0]
+    
+    @staticmethod
+    def seznam_vseh():
+        """
+        Vrne seznam vseh podjetij
+        """
+        tabela_oseb = list()
+        conn.cursor()
+        sql = """
+            SELECT ime
+            FROM oseba
+            ORDER BY ime
+        """
+        for ime in conn.execute(sql):
+            tabela_oseb.append(ime[0])
+        return tabela_oseb
 
 
-class Datum():
+class Podjetje:
+    """
+    Razred za podjetje
+    """
+
+    def __init__(self, naziv, telefon=None, email=None):
+        """
+        Konstruktor podjetja
+        """
+        self.naziv = naziv
+        self.telefon = telefon
+        self.email = email
+
+    @staticmethod
+    def seznam_vseh():
+        """
+        Vrne seznam vseh podjetij
+        """
+        tabela_podjetij = list()
+        conn.cursor()
+        sql = """
+            SELECT naziv
+            FROM podjetje
+            ORDER BY naziv
+        """
+        for naziv in conn.execute(sql):
+            tabela_podjetij.append(naziv[0])
+        return tabela_podjetij
+
+
+class Datum:
     """
     Razred za delo z datumi
     """
@@ -346,5 +392,31 @@ class Datum():
         niz_mesec = mesec if int(mesec) >= 10 else ('0' + mesec)
         return '.'.join([niz_dan, niz_mesec, leto])
 
+class Stroskovno:
+    """
+    Razred za stroskovno mesto
+    """
+
+    def __init__(self, oznaka):
+        """
+        Konstruktor za stroskovno mesto
+        """
+        self.oznaka = oznaka
+
+    @staticmethod
+    def seznam_vseh():
+        """
+        Vrne seznam vseh stroskovnih mest v bazi
+        """
+        tabela_stroskovnih = list()
+        conn.cursor()
+        sql = """
+            SELECT oznaka
+            FROM stroskovno_mesto
+            ORDER BY oznaka
+        """
+        for oznaka in conn.execute(sql):
+            tabela_stroskovnih.append(oznaka[0])
+        return tabela_stroskovnih
 
     
