@@ -253,6 +253,7 @@
                     </div>
                     <div>
                         <button class="button is-success" type="button" id='potrdi_dobavitelj'>Potrdi</button>
+                        <button class="button is-danger is-pulled-right" type="button" id="preklici_dobavitelj">Prekliči</button>
                     </div>
                 </div>
             </div>
@@ -274,6 +275,7 @@
                     </div>
                     <div>
                         <button class="button is-success" type="button" id='potrdi_stroskovno'>Potrdi</button>
+                        <button class="button is-danger is-pulled-right" type="button" id="preklici_stroskovno">Prekliči</button>
                     </div>
                 </div>
             </div>
@@ -295,6 +297,7 @@
                     </div>
                     <div>
                         <button class="button is-success" type="button" id='potrdi_lokacija'>Potrdi</button>
+                        <button class="button is-danger is-pulled-right" type="button" id="preklici_lokacija">Prekliči</button>
                     </div>
                 </div>
             </div>
@@ -332,6 +335,7 @@
                     </div>
                     <div>
                         <button class="button is-success" type="button" id='potrdi_skrbnik'>Potrdi</button>
+                        <button class="button is-danger is-pulled-right" type="button" id="preklici_skrbnik">Prekliči</button>
                     </div>
                 </div>
             </div>
@@ -369,6 +373,7 @@
                     </div>
                     <div>
                         <button class="button is-success" type="button" id='potrdi_serviser'>Potrdi</button>
+                        <button class="button is-danger is-pulled-right" type="button" id="preklici_serviser">Prekliči</button>
                     </div>
                 </div>
             </div>
@@ -384,9 +389,9 @@
         var mesec = n.getMonth() + 1;
         var dan = n.getDate();
 
-        select_dan = document.getElementById("select_dan_" + ime_podatkov);
-        select_mesec = document.getElementById("select_mesec_" + ime_podatkov);
-        select_leto = document.getElementById("select_leto_" + ime_podatkov);
+        var select_dan = document.getElementById("select_dan_" + ime_podatkov);
+        var select_mesec = document.getElementById("select_mesec_" + ime_podatkov);
+        var select_leto = document.getElementById("select_leto_" + ime_podatkov);
         
         for (var i = 1; i <= 12; i++)
             select_mesec.options[select_mesec.options.length] = new Option(i, i);
@@ -396,26 +401,27 @@
 
         select_mesec.selectedIndex = mesec - 1;
         select_leto.value = leto;
-        posodobi_dneve(select_dan, ime_podatkov);
+        posodobi_dneve(ime_podatkov);
         select_dan.selectedIndex = dan - 1;
 
         select_mesec.onchange = function(){
-            posodobi_dneve(select_dan, ime_podatkov);
+            posodobi_dneve(ime_podatkov);
         }
         
         select_leto.onchange = function(){
-            posodobi_dneve(select_dan, ime_podatkov);
+            posodobi_dneve(ime_podatkov);
         }
     }
 
-    function posodobi_dneve(selectElement, ime_podatkov) {
-            trenutno_izbran_dan = selectElement.value;
-            var i, L = selectElement.options.length - 1;
+    function posodobi_dneve(ime_podatkov) {
+            var dan = document.getElementById("select_dan_" + ime_podatkov);
+            trenutno_izbran_dan = dan.value;
+            var i, L = dan.options.length - 1;
             for(i = L; i >= 0; i--) 
-                selectElement.remove(i);
+                dan.remove(i);
         
-            mesec = document.getElementById("select_mesec_" + ime_podatkov).value;
-            leto = document.getElementById("select_leto_" + ime_podatkov).value;
+            var mesec = document.getElementById("select_mesec_" + ime_podatkov).value;
+            var leto = document.getElementById("select_leto_" + ime_podatkov).value;
 
             if (mesec == 2)
                 if (((leto % 4 == 0) && (leto % 100 != 0)) || (leto % 400 == 0))
@@ -429,9 +435,9 @@
                     st_dni = 31;
         
             for (var i = 1; i <= st_dni; i++)
-                selectElement.options[selectElement.options.length] = new Option(i, i);
+                dan.options[dan.options.length] = new Option(i, i);
             
-            selectElement.selectedIndex = trenutno_izbran_dan - 1
+            dan.selectedIndex = trenutno_izbran_dan - 1
         }
 
     function odpri_obrazec(ime_obrazca){
@@ -448,20 +454,30 @@
         obrazec.classList.remove('is-active');
     }
 
+    function preklici_obrazec(ime_obrazca){
+        var obrazec = document.querySelector('#obrazec_' + ime_obrazca);
+        obrazec.classList.remove('is-active');
+    }
+
     function ustvari_eventlistener(ime, index){
         var prikazi = document.querySelector('#dodaj_' + ime);
-        var zapri = document.querySelector('#potrdi_' + ime);
+        var potrdi = document.querySelector('#potrdi_' + ime);
+        var preklici = document.querySelector('#preklici_' + ime);
 
         prikazi.addEventListener('click', function(){
             odpri_obrazec(ime);
         });
 
-        zapri.addEventListener('click', function(){
+        potrdi.addEventListener('click', function(){
             potrdi_obrazec(ime);
+        });
+
+        preklici.addEventListener('click', function(){
+            preklici_obrazec(ime);
         });
     }
 
-    tabela_dodajanj = ['dobavitelj', 'stroskovno', 'lokacija', 'skrbnik', 'serviser'];
+    var tabela_dodajanj = ['dobavitelj', 'stroskovno', 'lokacija', 'skrbnik', 'serviser'];
     tabela_dodajanj.forEach(ustvari_eventlistener);
 
     napolni_datume('garancija');
