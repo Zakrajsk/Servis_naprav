@@ -20,7 +20,16 @@ def nova_naprava():
 def nova_naprava_post():
     podatki = bottle.request.forms
     print(*podatki)
+
+    garancija = Datum.pretvori_v_niz(podatki['dan_garancija'], podatki['mesec_garancija'], podatki['leto_garancija'])
+    dobava = Datum.pretvori_v_niz(podatki['dan_dobava'], podatki['mesec_dobava'], podatki['leto_dobava'])
+
+    nova_naprava = Naprava(podatki['inventarna'], podatki['naziv'], podatki['tip'], garancija,
+                           podatki['proizvajalec'], podatki['serijska'], podatki['dobavitelj'],
+                           dobava, podatki['serviser'], podatki['stroskovno'], podatki['rlp'])
+
     return bottle.template('zacetna_stran.html')
+
 
 @bottle.get('/opis-naprave/')
 def opis_opreme():
@@ -89,7 +98,7 @@ def prevzem():
 def prevzem_post():
     if bottle.request.forms.get('iskanje_naprave'):
         inventarna = bottle.request.forms.get('inventarna')
-        st, popravila = Popravilo.aktivna_popravila(inventarna)
+        st, popravila = Popravilo.popravila_v_fazi(inventarna, 'aktivacija')
         return bottle.template(
             'prevzem.html',
             inventarna=inventarna,
@@ -104,7 +113,7 @@ def prevzem_post():
         mesec = podatki.get('mesec')
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
-        st, popravilo = Popravilo.aktivna_popravila(inventarna)
+        st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'aktivacija')
         faza = Faza('sprejem', popravilo[0], datum)
         faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
@@ -119,7 +128,7 @@ def vrnitev():
 def vrnitev_post():
     if bottle.request.forms.get('iskanje_naprave'):
         inventarna = bottle.request.forms.get('inventarna')
-        st, popravila = Popravilo.prevzeta_popravila(inventarna)
+        st, popravila = Popravilo.popravila_v_fazi(inventarna, 'sprejem')
         return bottle.template(
             'vrnitev.html',
             inventarna=inventarna,
@@ -134,7 +143,7 @@ def vrnitev_post():
         mesec = podatki.get('mesec')
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
-        st, popravilo = Popravilo.prevzeta_popravila(inventarna)
+        st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'sprejem')
         faza = Faza('vrnitev', popravilo[0], datum)
         faza.dodaj_v_bazo()
         if podatki.get('zakljucitev'):
@@ -152,7 +161,7 @@ def zakljuci():
 def zakluci_post():
     if bottle.request.forms.get('iskanje_naprave'):
         inventarna = bottle.request.forms.get('inventarna')
-        st, popravila = Popravilo.vrnjena_popravila(inventarna)
+        st, popravila = Popravilo.popravila_v_fazi(inventarna, 'vrnitev')
         return bottle.template(
             'zakljuci.html',
             inventarna=inventarna,
@@ -163,7 +172,7 @@ def zakluci_post():
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
         inventarna = podatki.get('inventarna')
-        st, popravilo = Popravilo.vrnjena_popravila(inventarna)
+        st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'vrnitev')
         faza = Faza('zakljuceno', popravilo[0])
         faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')

@@ -15,7 +15,7 @@ class Naprava:
     insert = naprava.dodajanje(["inventarna", "naziv", "tip"])
 
     def __init__(self, inventarna, naziv, tip=None, garancija=None, proizvajalec=None,
-                 serijska=None, stroskovno=None, dobavitelj=None, dobava=None, serviser=None, rlp=None):
+                 serijska=None, dobavitelj=None, dobava=None, serviser=None, stroskovno=None, rlp=None):
         """
         Konstruktor naprave
         """
@@ -25,10 +25,10 @@ class Naprava:
         self.garancija = garancija
         self.proizvajalec = proizvajalec
         self.serijska = serijska
-        self.stroskovno = stroskovno
         self.dobavitelj = dobavitelj
         self.dobava = dobava
         self.serviser = serviser
+        self.stroskovno = stroskovno
         self.rlp = rlp
     
     @staticmethod
@@ -43,10 +43,10 @@ class Naprava:
                 naprava.garancija,
                 naprava.proizvajalec,
                 naprava.serijska,
-                naprava.stroskovno,
                 naprava.dobavitelj,
                 naprava.dobava,
                 naprava.serviser,
+                naprava.stroskovno,
                 naprava.rlp
             FROM naprava
             WHERE inventarna = ?
@@ -69,7 +69,11 @@ class Naprava:
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
         return rez[0]
-        
+
+    def dodaj_v_bazo(self):
+        """
+        Doda napravo v bazo
+        """
 
 class Popravilo:
     """
@@ -111,11 +115,12 @@ class Popravilo:
             popravilo.dodaj_vrstico([self.st_narocila, self.tip, self.opis, self.naprava], insert)
 
     @staticmethod
-    def aktivna_popravila(inventarna):
+    def popravila_v_fazi(inventarna, faza):
         """
-        Vrne stevilo in tabelo vseh aktivnih popravil, ki so na stopnji aktivacije
+        Vrne stevilo in tabelo vseh popravil, ki so v podani fazi
         """
         tabela_popravil = list()
+        faze = {'aktivacija':1, 'sprejem': 2, 'vrnitev':3}
         sql = """
             SELECT faza.popravilo
             FROM faza
@@ -123,47 +128,9 @@ class Popravilo:
                 popravilo ON faza.popravilo = popravilo.st_narocila
             WHERE popravilo.naprava = ?
             GROUP BY faza.popravilo
-            HAVING count(faza.popravilo) = 1;
+            HAVING count(faza.popravilo) = ?;
         """
-        for popravilo in conn.execute(sql, [inventarna]):
-            tabela_popravil.append(popravilo[0])
-        return (len(tabela_popravil), tabela_popravil)
-
-    @staticmethod
-    def prevzeta_popravila(inventarna):
-        """
-        Vrne stevilo in tabelo vseh popravil, ki so bila prevzeta
-        """
-        tabela_popravil = list()
-        sql = """
-            SELECT faza.popravilo
-            FROM faza
-                JOIN
-                popravilo ON faza.popravilo = popravilo.st_narocila
-            WHERE popravilo.naprava = ?
-            GROUP BY faza.popravilo
-            HAVING count(faza.popravilo) = 2;
-        """
-        for popravilo in conn.execute(sql, [inventarna]):
-            tabela_popravil.append(popravilo[0])
-        return (len(tabela_popravil), tabela_popravil)
-
-    @staticmethod
-    def vrnjena_popravila(inventarna):
-        """
-        Vrne stevilo in tabelo vseh popravil, ki so bila prevzeta
-        """
-        tabela_popravil = list()
-        sql = """
-            SELECT faza.popravilo
-            FROM faza
-                JOIN
-                popravilo ON faza.popravilo = popravilo.st_narocila
-            WHERE popravilo.naprava = ?
-            GROUP BY faza.popravilo
-            HAVING count(faza.popravilo) = 3;
-        """
-        for popravilo in conn.execute(sql, [inventarna]):
+        for popravilo in conn.execute(sql, [inventarna, faze[faza]]):
             tabela_popravil.append(popravilo[0])
         return (len(tabela_popravil), tabela_popravil)
 
