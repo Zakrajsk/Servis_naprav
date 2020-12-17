@@ -1,5 +1,5 @@
 import bottle
-from model import Naprava, Popravilo, Nahajanje, Oseba, Datum, Faza, Lokacija, Podjetje, Stroskovno
+from model import Naprava, Popravilo, Nahajanje, Oseba, Datum, Faza, Lokacija, Podjetje, Stroskovno, Skrbnistvo
 
 bottle.TEMPLATE_PATH.insert(0,'views')
 
@@ -20,14 +20,40 @@ def nova_naprava():
 def nova_naprava_post():
     podatki = bottle.request.forms
     print(*podatki)
+    celotna_inventarna = "74600" + podatki['inventarna']
 
     garancija = Datum.pretvori_v_niz(podatki['dan_garancija'], podatki['mesec_garancija'], podatki['leto_garancija'])
     dobava = Datum.pretvori_v_niz(podatki['dan_dobava'], podatki['mesec_dobava'], podatki['leto_dobava'])
 
-    nova_naprava = Naprava(podatki['inventarna'], podatki['naziv'], podatki['tip'], garancija,
-                           podatki['proizvajalec'], podatki['serijska'], podatki['dobavitelj'],
-                           dobava, podatki['serviser'], podatki['stroskovno'], podatki['rlp'])
+    #ali obstaja ta dobavitelj
+    if not Podjetje.ali_ze_obstaja(podatki["dobavitelj"]):
+        print("dobavitelj se ne obstaja")
+        nov_dobavitelj = Podjetje(podatki['dobavitelj'], podatki['telefon_dobavitelj'], podatki['email_dobavitelj'])
+        nov_dobavitelj.dodaj_v_bazo()
 
+    if not Podjetje.ali_ze_obstaja(podatki["serviser"]):
+        print("serviser se ne obstaja")
+        nov_serviser = Podjetje(podatki['serviser'], podatki['telefon_serviser'], podatki['email_serviser'])
+        nov_serviser.dodaj_v_bazo()
+
+    nova_naprava = Naprava(celotna_inventarna, podatki['naziv'], podatki['tip'], garancija,
+                           podatki['proizvajalec'], podatki['serijska'], podatki['dobavitelj'],
+                           dobava, podatki['serviser'], podatki['stroskovno'], podatki['RLP'])
+    novo_nahajanje = Nahajanje(od=dobava, naprava=celotna_inventarna, lokacija=podatki['lokacija'])
+
+    nova_naprava.dodaj_v_bazo()
+    novo_nahajanje.dodaj_v_bazo()
+
+    id_skrbnika = Oseba.ali_ze_obstaja(podatki["skrbnik"])
+    #ali obstaja ta skrbnik
+    if id_skrbnika == -1:
+        #dodamo osebo, ker je nova
+        nov_skrbnik = Oseba(podatki["skrbnik"], podatki["telefon_skrbnik"], podatki["email_skrbnik"])
+        id_skrbnika = nov_skrbnik.dodaj_v_bazo()
+
+    novo_skrbnistvo = Skrbnistvo(od=dobava, skrbnik=id_skrbnika, naprava=celotna_inventarna)
+    novo_skrbnistvo.dodaj_v_bazo()
+    
     return bottle.template('zacetna_stran.html')
 
 
@@ -147,7 +173,7 @@ def vrnitev_post():
         faza = Faza('vrnitev', popravilo[0], datum)
         faza.dodaj_v_bazo()
         if podatki.get('zakljucitev'):
-            koncna_faza = Faza('zakljuceno', popravilo[0])
+            koncna_faza = Faza('zakljuceno', popravilo[0], datum)
             koncna_faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 

@@ -309,10 +309,10 @@ class Nahajanje(Tabela):
         """
         Dodaj nahajanja in pripadajočo lokacijo
         """
-        assert oznaka is not None
-        if insert is None:
-            insert = self.lokacija.dodajanje(["oznaka"])
-        podatki[oznaka] = self.lokacija.dodaj_vrstico([podatki[oznaka]], insert)
+        if oznaka is not None:
+            if insert is None:
+                insert = self.lokacija.dodajanje(["oznaka"])
+            podatki[oznaka] = self.lokacija.dodaj_vrstico([podatki[oznaka]], insert)
         return super().dodaj_vrstico(podatki, poizvedba)
 
 

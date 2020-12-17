@@ -74,6 +74,12 @@ class Naprava:
         """
         Doda napravo v bazo
         """
+        insert = naprava.dodajanje(["inventarna", "naziv", "tip", "garancija", "proizvajalec", 
+                                   "serijska", "dobavitelj", "dobava", "serviser", "stroskovno", "rlp"])
+        with conn:
+            stroskovno_mesto.dodaj_vrstico([self.stroskovno])
+            naprava.dodaj_vrstico([self.inventarna, self.naziv, self.tip, self.garancija, self.proizvajalec,
+                                  self.serijska, self.dobavitelj, self.dobava, self.serviser, self.stroskovno, self.rlp], insert)
 
 class Popravilo:
     """
@@ -177,8 +183,6 @@ class Nahajanje:
     Razred za nahajanje
     """
 
-    inset = nahajanje.dodajanje(["od", "do"])
-
     def __init__(self, od=None, do=None, naprava=None, lokacija=None):
         """
         Konstruktor nahajanja
@@ -207,6 +211,16 @@ class Nahajanje:
             if do == None:
                 do = ''
             yield Nahajanje(od, do)
+    
+    def dodaj_v_bazo(self):
+        """
+        Doda to nahajanje in lokacijo v bazo
+        """
+        insert = nahajanje.dodajanje(["od", "do", "naprava", "lokacija"])
+        with conn:
+            id_lokacije = lokacija.dodaj_vrstico([self.lokacija], lokacija.dodajanje(["oznaka"]))
+            nahajanje.dodaj_vrstico([self.od, self.do, self.naprava, id_lokacije], insert)
+
 
 
 class Lokacija:
@@ -306,6 +320,55 @@ class Oseba:
             tabela_oseb.append(ime[0])
         return tabela_oseb
 
+    @staticmethod
+    def ali_ze_obstaja(ime):
+        """
+        Vrne id osebe ce ze obtaja drugace vrne -1
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT id
+            FROM oseba
+            WHERE ime = ?
+        """
+        cur.execute(sql, [ime])
+        rez = cur.fetchone()
+        return rez[0] if rez != None else -1
+    
+    def dodaj_v_bazo(self):
+        """
+        Doda novo osebo v bazo
+        """
+        insert = oseba.dodajanje(["ime", "telefon", "email"])
+        with conn:
+            return oseba.dodaj_vrstico([self.ime, self.telefon, self.email], insert)
+
+
+class Skrbnistvo:
+    """
+    Razred za skrbnistvo
+    """
+
+    def __init__(self, od=None, do=None, skrbnik=None, naprava=None):
+        """
+        Kostruktor skrbnistva
+        """
+        self.od = od
+        self.do = do
+        self.skrbnik = skrbnik
+        self.naprava = naprava
+
+    def dodaj_v_bazo(self):
+        """
+        Doda to skrbnistvo v bazo
+        """
+        insert = skrbnistvo.dodajanje(["od", "do", "skrbnik", "naprava"])
+        with conn:
+            return skrbnistvo.dodaj_vrstico([self.od, self.do, self.skrbnik, self.naprava], insert)
+    
+
+
+
 
 class Podjetje:
     """
@@ -335,6 +398,29 @@ class Podjetje:
         for naziv in conn.execute(sql):
             tabela_podjetij.append(naziv[0])
         return tabela_podjetij
+
+    @staticmethod
+    def ali_ze_obstaja(naziv):
+        """
+        Vrne true ce podjetje ze obstaja
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT naziv
+            FROM podjetje
+            WHERE naziv = ?
+        """
+        cur.execute(sql, [naziv])
+        rez = cur.fetchone()
+        return True if rez != None else False
+
+    def dodaj_v_bazo(self):
+        """
+        Doda novo podjetje v bazo
+        """
+        insert = podjetje.dodajanje(["naziv", "telefon", "email"])
+        with conn:
+            return podjetje.dodaj_vrstico([self.naziv, self.telefon, self.email], insert)
 
 
 class Datum:
