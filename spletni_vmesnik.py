@@ -63,7 +63,7 @@ def opis_opreme():
 
 @bottle.post('/opis-naprave/')
 def opis_post():
-    inventarna = bottle.request.forms.get('inventarna')
+    inventarna =  "74600" + bottle.request.forms.get('inventarna')
     return bottle.template(
         'opis_naprave.html',
         inventarna=inventarna,
@@ -89,10 +89,10 @@ def aktiviraj_postopek():
 @bottle.post('/aktivacija-postopka/')
 def aktiviraj_postopek_post():
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = bottle.request.forms.get('inventarna')
+        inventarna = "74600" + bottle.request.forms.get('inventarna')
         return bottle.template(
             'aktivacija_postopka.html',
-            inventarna=inventarna,
+            inventarna = inventarna,
             naziv = Naprava.vrni_naziv(inventarna),
             lokacija = Lokacija.zadnja_lokacija(inventarna))
 
@@ -123,11 +123,11 @@ def prevzem():
 @bottle.post('/prevzem/')
 def prevzem_post():
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = bottle.request.forms.get('inventarna')
+        inventarna = "74600" + bottle.request.forms.get('inventarna')
         st, popravila = Popravilo.popravila_v_fazi(inventarna, 'aktivacija')
         return bottle.template(
             'prevzem.html',
-            inventarna=inventarna,
+            inventarna = inventarna,
             naziv = Naprava.vrni_naziv(inventarna),
             lokacija = Lokacija.zadnja_lokacija(inventarna),
             napaka = True if st == 0 else False)
@@ -153,7 +153,7 @@ def vrnitev():
 @bottle.post('/vrnitev/')
 def vrnitev_post():
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = bottle.request.forms.get('inventarna')
+        inventarna = "74600" + bottle.request.forms.get('inventarna')
         st, popravila = Popravilo.popravila_v_fazi(inventarna, 'sprejem')
         return bottle.template(
             'vrnitev.html',
@@ -173,7 +173,7 @@ def vrnitev_post():
         faza = Faza('vrnitev', popravilo[0], datum)
         faza.dodaj_v_bazo()
         if podatki.get('zakljucitev'):
-            koncna_faza = Faza('zakljuceno', popravilo[0], datum)
+            koncna_faza = Faza('zakljuceno', popravilo[0])
             koncna_faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 
@@ -186,7 +186,7 @@ def zakljuci():
 @bottle.post('/zakljucek/')
 def zakluci_post():
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = bottle.request.forms.get('inventarna')
+        inventarna = "74600" + bottle.request.forms.get('inventarna')
         st, popravila = Popravilo.popravila_v_fazi(inventarna, 'vrnitev')
         return bottle.template(
             'zakljuci.html',
@@ -199,13 +199,18 @@ def zakluci_post():
         podatki = bottle.request.forms
         inventarna = podatki.get('inventarna')
         st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'vrnitev')
-        faza = Faza('zakljuceno', popravilo[0])
+        faza = Faza('zakljuceno', popravilo[0],)
         faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 
 @bottle.get('/aktivirane-naprave/')
 def aktivirane_naprave():
-    return bottle.template('aktivirane_naprave.html')
+    vse_naprave_v_aktivaciji = Popravilo.vsa_popravila_v_fazi('aktivacija')
+    koncna_tabela = list()
+    for st, posamezna in enumerate(vse_naprave_v_aktivaciji):
+        temp = list(Naprava.vrni_aktivacijske_podatke(posamezna[0]))
+        koncna_tabela.append([st + 1, posamezna[0]] + [temp[0]] + posamezna[1:] + temp[1:])
+    return bottle.template('aktivirane_naprave.html', vse_naprave=koncna_tabela)
 
 @bottle.get('/na-servisu/')
 def na_servisu():

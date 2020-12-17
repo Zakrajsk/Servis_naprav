@@ -70,6 +70,27 @@ class Naprava:
         rez = cur.fetchone()
         return rez[0]
 
+    @staticmethod
+    def vrni_aktivacijske_podatke(inventarna):
+        """
+        Vrne naziv, lokacijo in servis
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT naprava.naziv,
+                lokacija.oznaka,
+                naprava.serviser
+            FROM naprava
+                JOIN
+                nahajanje ON naprava.inventarna = nahajanje.naprava
+                JOIN
+                lokacija ON nahajanje.lokacija = lokacija.id
+            WHERE inventarna = ?;
+        """
+        cur.execute(sql, [inventarna])
+        rez = cur.fetchone()
+        return rez
+
     def dodaj_v_bazo(self):
         """
         Doda napravo v bazo
@@ -140,6 +161,28 @@ class Popravilo:
             tabela_popravil.append(popravilo[0])
         return (len(tabela_popravil), tabela_popravil)
 
+    @staticmethod
+    def vsa_popravila_v_fazi(faza):
+        """
+        Vrne inventarno, st narocila, tip in pa datum naprav v tej fazi
+        """
+        tabela_inventarnih = list()
+        faze = {'aktivacija':1, 'sprejem': 2, 'vrnitev':3}
+        sql = """
+            SELECT popravilo.naprava,
+                popravilo.st_narocila,
+                popravilo.tip,
+                faza.datum
+            FROM faza
+                JOIN
+                popravilo ON faza.popravilo = popravilo.st_narocila
+            GROUP BY faza.popravilo
+            HAVING count(faza.popravilo) = ?;
+        """
+        tabela_ustreznih = list()
+        for inventarna, st_narocila, tip, datum in conn.execute(sql, [faze[faza]]):
+            tabela_ustreznih.append([inventarna, st_narocila, tip, datum])
+        return tabela_ustreznih
 
 class Faza:
     """
