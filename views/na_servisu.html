@@ -40,7 +40,17 @@
             </tr>
           </thead>
           <tbody>
-
+            % for ena in vse_naprave:
+            <tr>
+                <td>{{ena[0]}}</td>
+                <td>{{ena[1]}}</td>
+                <td>{{ena[2]}}</td>
+                <td>{{ena[3]}}</td>
+                <td>{{ena[4]}}</td>
+                <td>{{ena[5]}}</td>
+                <td>{{ena[6]}}</td>
+            </tr>
+            %end
           </tbody>
     </table>
   </div>

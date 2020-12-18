@@ -214,11 +214,21 @@ def aktivirane_naprave():
 
 @bottle.get('/na-servisu/')
 def na_servisu():
-    return bottle.template('na_servisu.html')
+    vse_naprave_v_prevzemu = Popravilo.vsa_popravila_v_fazi('sprejem')
+    koncna_tabela = list()
+    for st, posamezna in enumerate(vse_naprave_v_prevzemu):
+        temp = list(Naprava.vrni_aktivacijske_podatke(posamezna[0]))
+        koncna_tabela.append([st + 1, posamezna[0]] + [temp[0]] + posamezna[2:] + temp[1:])
+    return bottle.template('na_servisu.html', vse_naprave=koncna_tabela)
 
 @bottle.get('/nedokoncani/')
 def nedokoncani():
-    return bottle.template('nedokoncani.html')
+    vse_naprave_nedokoncane = Popravilo.vsa_popravila_v_fazi('vrnitev')
+    koncna_tabela = list()
+    for st, posamezna in enumerate(vse_naprave_nedokoncane):
+        temp = list(Naprava.vrni_aktivacijske_podatke(posamezna[0]))
+        koncna_tabela.append([st + 1, posamezna[0]] + [temp[0]] + posamezna[2:] + temp[1:])
+    return bottle.template('nedokoncani.html', vse_naprave=koncna_tabela)
 
 @bottle.get('/odtujen/')
 def odtujen():
