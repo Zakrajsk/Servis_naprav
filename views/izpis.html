@@ -26,10 +26,10 @@
                     <option value='lokacije'>Po lokaciji</option>
                     <option value='serviserji'>Po serviserjih</option>
                     <option value='RLP'>Naslednji RLP</option>
-                    <option value='Odpisani'>Odpisani</option>
-                    <option value='Odtujeni'>Odtujeni</option>
-                    <option value='Nazivi'>Po nazivu</option>
-                    <option value='Brez_RLP'>Brez RLP-ja</option>
+                    <option value='odpisani'>Odpisani</option>
+                    <option value='odtujeni'>Odtujeni</option>
+                    <option value='nazivi'>Po nazivu</option>
+                    <option value='brez_RLP'>Brez RLP-ja</option>
                 </select>
             </div>
         </div>
@@ -43,14 +43,19 @@
 <table class="table is-striped is-fullwidth is-hoverable is-bordered">
     <thead>
       <tr>
-        <th><abbr title="Position">Naziv</abbr></th>
-        <th><abbr title="Played">Tip</abbr></th>
-        <th><abbr title="Won">Datum</abbr></th>
-        <th><abbr title="Drawn">Datum</abbr></th>
+        %for ime in stolpci:
+        <th><abbr>{{ime}}</abbr></th>
+        %end
       </tr>
     </thead>
     <tbody>
-
+        %for naprava in vse_naprave:
+        <tr>
+            %for oznaka in stolpci:
+            <td>{{naprava[oznaka]}}</td>
+            %end
+        </tr>
+        %end
     </tbody>    
 </table>
 

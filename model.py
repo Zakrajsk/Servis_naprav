@@ -54,6 +54,94 @@ class Naprava:
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
         return Naprava(inventarna, *rez)
+    
+    @staticmethod
+    def vse_za_izpis(sortiraj_po):
+        """
+        Vrne tabele vseh naprav predstavljeno s slovarjem, ki niso odtujene
+        """
+        conn.cursor()
+        sql = """
+            SELECT naprava.inventarna,
+                naprava.naziv,
+                naprava.tip,
+                naprava.serijska,
+                naprava.serviser,
+                naprava.rlp,
+                lokacija.oznaka
+            FROM naprava
+                JOIN
+                nahajanje ON naprava.inventarna = nahajanje.naprava
+                JOIN
+                lokacija ON lokacija.id = nahajanje.lokacija
+            WHERE nahajanje.[do] IS NULL AND 
+                lokacija.oznaka NOT LIKE 'odtujena'
+            ORDER BY ?;
+        """
+        tabela_ustreznih = list()
+        for inventarna, naziv, tip, serijska, serviser, rlp, lokacija in conn.execute(sql, [sortiraj_po]):
+            temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
+                            'Servis': serviser, 'RLP': rlp, 'Lokacija': lokacija}
+            tabela_ustreznih.append(temp_naprava)
+        return tabela_ustreznih
+
+    @staticmethod
+    def vse_odpisane():
+        """
+        Vrne vse naprave, ki so odpisane, od njih vrne vse ustrezne podatke
+        """
+        conn.cursor()
+        sql = """
+            SELECT naprava.inventarna,
+                naprava.naziv,
+                naprava.tip,
+                naprava.serijska,
+                naprava.serviser,
+                nahajanje.od,
+                lokacija.oznaka
+            FROM naprava
+                JOIN
+                nahajanje ON naprava.inventarna = nahajanje.naprava
+                JOIN
+                lokacija ON lokacija.id = nahajanje.lokacija
+            WHERE nahajanje.[do] IS NULL AND 
+                lokacija.oznaka LIKE 'odpisana';
+        """
+        tabela_ustreznih = list()
+        for inventarna, naziv, tip, serijska, serviser, od, lokacija in conn.execute(sql):
+            temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip,
+                            'Serijska': serijska, 'Servis': serviser, 'Datum odpisa': od, 'Lokacija': lokacija}
+            tabela_ustreznih.append(temp_naprava)
+        return tabela_ustreznih
+    
+    @staticmethod
+    def vse_odtujene():
+        """
+        Vrne vse naprave, ki so odtujene, od njih vrne vse ustrezne podatke
+        """
+        conn.cursor()
+        sql = """
+            SELECT naprava.inventarna,
+                naprava.naziv,
+                naprava.tip,
+                naprava.serijska,
+                naprava.serviser,
+                nahajanje.od,
+                lokacija.oznaka
+            FROM naprava
+                JOIN
+                nahajanje ON naprava.inventarna = nahajanje.naprava
+                JOIN
+                lokacija ON lokacija.id = nahajanje.lokacija
+            WHERE nahajanje.[do] IS NULL AND 
+                lokacija.oznaka LIKE 'odtujena';
+        """
+        tabela_ustreznih = list()
+        for inventarna, naziv, tip, serijska, serviser, od, lokacija in conn.execute(sql):
+            temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
+                            'Servis': serviser, 'Datum odtujitve': od, 'Lokacija': lokacija}
+            tabela_ustreznih.append(temp_naprava)
+        return tabela_ustreznih
 
     @staticmethod
     def vrni_naziv(inventarna):

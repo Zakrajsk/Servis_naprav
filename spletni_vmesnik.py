@@ -80,7 +80,26 @@ def izpisi():
 @bottle.post('/izpisi/')
 def izpisi_post():
     tip_izpisa = bottle.request.forms.get('tip_izpisa')
-    return bottle.template('izpis.html', tip_izpisa=tip_izpisa)
+    vrstni_red_stolpcev = list()
+    tabela_moznih_stolpcev = ['Inventarna', 'Naziv', 'Tip', 'Serijska', 'Servis', 'Lokacija', 'Naslednji RLP',
+                              'Datum odpisa', 'Datum odtujitve']
+    
+    zaporedja = {'lokacije': '501234', 'serviserji': '401235', 'RLP': '6012354', 'odpisani': '7012354',
+                 'odtujeni': '8012354', 'nazivi': '102354'}
+
+    slovar_sortiranja = {'lokacije': 'lokacija.oznaka', 'serviserji': 'naprava.serviser', 'nazivi': 'naprava.naziv'}
+
+    if tip_izpisa not in ['odpisani', 'odtujeni']:
+        tabela_vseh_naprav = Naprava.vse_za_izpis(slovar_sortiranja[tip_izpisa])
+    elif tip_izpisa == 'odpisani':
+        tabela_vseh_naprav = Naprava.vse_odpisane()
+    else:
+        tabela_vseh_naprav = Naprava.vse_odtujene()
+    
+    for stolpec in zaporedja[tip_izpisa]:
+        vrstni_red_stolpcev.append(tabela_moznih_stolpcev[int(stolpec)])
+
+    return bottle.template('izpis.html', tip_izpisa=tip_izpisa, stolpci=vrstni_red_stolpcev, vse_naprave = tabela_vseh_naprav)
 
 @bottle.get('/aktivacija-postopka/')
 def aktiviraj_postopek():
