@@ -80,6 +80,8 @@ def izpisi():
 @bottle.post('/izpisi/')
 def izpisi_post():
     tip_izpisa = bottle.request.forms.get('tip_izpisa')
+    if tip_izpisa == None:
+        return bottle.template('izpis.html', tip_izpisa=None)
     vrstni_red_stolpcev = list()
     tabela_moznih_stolpcev = ['Inventarna', 'Naziv', 'Tip', 'Serijska', 'Servis', 'Lokacija', 'Naslednji RLP',
                               'Datum odpisa', 'Datum odtujitve']
@@ -87,7 +89,7 @@ def izpisi_post():
     zaporedja = {'lokacije': '501234', 'serviserji': '401235', 'RLP': '6012354', 'odpisani': '7012354',
                  'odtujeni': '8012354', 'nazivi': '102354'}
 
-    slovar_sortiranja = {'lokacije': 'lokacija.oznaka', 'serviserji': 'naprava.serviser', 'nazivi': 'naprava.naziv'}
+    slovar_sortiranja = {'lokacije': 'lokacija.oznaka', 'serviserji': 'naprava.serviser', 'nazivi': 'naprava.naziv', 'RLP': 'naprava.naziv'}
 
     if tip_izpisa not in ['odpisani', 'odtujeni']:
         tabela_vseh_naprav = Naprava.vse_za_izpis(slovar_sortiranja[tip_izpisa])
@@ -99,6 +101,20 @@ def izpisi_post():
     for stolpec in zaporedja[tip_izpisa]:
         vrstni_red_stolpcev.append(tabela_moznih_stolpcev[int(stolpec)])
 
+    for naprava in tabela_vseh_naprav:
+        print(naprava)
+
+    if tip_izpisa == 'RLP':
+        #za vse naprave zracunamo naslednji datum letnega pregleda
+        for naprava in tabela_vseh_naprav:
+            datum_zadnjega_RLP = Popravilo.zadnji_rlp(naprava['Inventarna'])
+            if datum_zadnjega_RLP == -1:
+                naprava['Naslednji RLP'] = Datum.pristej_mesece(naprava['Dobava'], naprava['RLP'])
+            else:
+                nov_datum = Datum.pristej_mesece(datum_zadnjega_RLP, naprava['RLP'])
+                naprava['Naslednji RLP'] = nov_datum
+        tabela_vseh_naprav.sort(key=lambda x: Datum.za_sortiranje(x['Naslednji RLP']))
+                
     return bottle.template('izpis.html', tip_izpisa=tip_izpisa, stolpci=vrstni_red_stolpcev, vse_naprave = tabela_vseh_naprav)
 
 @bottle.get('/aktivacija-postopka/')

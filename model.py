@@ -1,3 +1,4 @@
+from os import stat
 import baza
 import sqlite3
 
@@ -60,7 +61,7 @@ class Naprava:
         """
         Vrne tabele vseh naprav predstavljeno s slovarjem, ki niso odtujene
         """
-        conn.cursor()
+        cur = conn.cursor()
         sql = """
             SELECT naprava.inventarna,
                 naprava.naziv,
@@ -68,6 +69,7 @@ class Naprava:
                 naprava.serijska,
                 naprava.serviser,
                 naprava.rlp,
+                naprava.dobava,
                 lokacija.oznaka
             FROM naprava
                 JOIN
@@ -76,12 +78,14 @@ class Naprava:
                 lokacija ON lokacija.id = nahajanje.lokacija
             WHERE nahajanje.[do] IS NULL AND 
                 lokacija.oznaka NOT LIKE 'odtujena'
-            ORDER BY ?;
-        """
+            ORDER BY
+        """ + sortiraj_po + ";"
         tabela_ustreznih = list()
-        for inventarna, naziv, tip, serijska, serviser, rlp, lokacija in conn.execute(sql, [sortiraj_po]):
+        print(sortiraj_po)
+        for inventarna, naziv, tip, serijska, serviser, rlp, dobava, lokacija in cur.execute(sql):
+            print(lokacija)
             temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
-                            'Servis': serviser, 'RLP': rlp, 'Lokacija': lokacija}
+                            'Servis': serviser, 'RLP': rlp, 'Dobava': dobava, 'Lokacija': lokacija}
             tabela_ustreznih.append(temp_naprava)
         return tabela_ustreznih
 
@@ -254,7 +258,6 @@ class Popravilo:
         """
         Vrne inventarno, st narocila, tip in pa datum naprav v tej fazi
         """
-        tabela_inventarnih = list()
         faze = {'aktivacija':1, 'sprejem': 2, 'vrnitev':3}
         sql = """
             SELECT popravilo.naprava,
@@ -271,6 +274,28 @@ class Popravilo:
         for inventarna, st_narocila, tip, datum in conn.execute(sql, [faze[faza]]):
             tabela_ustreznih.append([inventarna, st_narocila, tip, datum])
         return tabela_ustreznih
+
+    @staticmethod
+    def zadnji_rlp(inventarna):
+        """
+        Vrne kdaj je imela inventarna zadnji letni pregled, ce ga se ni imela vrne -1
+        """
+        cur = conn.cursor()
+        sql = """
+        SELECT faza.datum
+        FROM popravilo
+            JOIN
+            faza ON popravilo.st_narocila = faza.popravilo
+        WHERE (tip = 'RLP' OR 
+                tip = 'RLP in popravilo') AND 
+            faza.stopnja = 'vrnitev' AND 
+            popravilo.naprava = ?
+        ORDER BY substr(faza.datum, 7) || substr(faza.datum, 4, 2) || substr(faza.datum, 1, 2) DESC
+        LIMIT 1;
+        """
+        cur.execute(sql, [inventarna])
+        rez = cur.fetchone()
+        return rez[0] if rez != None else -1
 
 class Faza:
     """
@@ -306,7 +331,6 @@ class Faza:
         insert = faza.dodajanje(['datum', 'stopnja', 'popravilo'])
         with conn:
             faza.dodaj_vrstico([self.datum, self.stopnja, self.popravilo], insert)
-
 
 
 class Nahajanje:
@@ -498,9 +522,6 @@ class Skrbnistvo:
             return skrbnistvo.dodaj_vrstico([self.od, self.do, self.skrbnik, self.naprava], insert)
     
 
-
-
-
 class Podjetje:
     """
     Razred za podjetje
@@ -575,6 +596,36 @@ class Datum:
         niz_dan = dan if int(dan) >= 10 else ('0' + dan)
         niz_mesec = mesec if int(mesec) >= 10 else ('0' + mesec)
         return '.'.join([niz_dan, niz_mesec, leto])
+    
+    @staticmethod
+    def pristej_mesece(niz_datum, st_mesecev):
+        """
+        Datumu, ki je v nizu pristeje mesece
+        """
+        st_mesecev = int(st_mesecev)
+        dan = int(niz_datum[0:2])
+        mesec = int(niz_datum[3:5])
+        leto = int(niz_datum[6:])
+        mesec += st_mesecev % 12
+        if mesec > 12:
+            leto += mesec // 12
+            mesec = mesec % 12
+        leto += st_mesecev // 12
+
+        prestopno_leto = ((leto % 4 == 0) and (leto % 100 != 0)) or (leto % 400 == 0)
+        st_dni = [31, 29 if prestopno_leto else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        if dan > st_dni[mesec - 1]:
+            dan = dan % st_dni[mesec - 1]
+            mesec += 1
+            #mescov ni potrebno ponovno pregledovati saj ima dec 31 dni
+        return '.'.join([str(dan) if dan >= 10 else '0' + str(dan), str(mesec) if mesec >= 10 else '0' + str(mesec), str(leto)])
+
+    @staticmethod
+    def za_sortiranje(datum):
+        """
+        Funckija za sortiranje datumov ki so v nizo
+        """
+        return datum[6:] + datum[3:5] + datum[0:2]
 
 class Stroskovno:
     """
