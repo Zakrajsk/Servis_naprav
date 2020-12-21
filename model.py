@@ -81,9 +81,7 @@ class Naprava:
             ORDER BY
         """ + sortiraj_po + ";"
         tabela_ustreznih = list()
-        print(sortiraj_po)
         for inventarna, naziv, tip, serijska, serviser, rlp, dobava, lokacija in cur.execute(sql):
-            print(lokacija)
             temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
                             'Servis': serviser, 'RLP': rlp, 'Dobava': dobava, 'Lokacija': lokacija}
             tabela_ustreznih.append(temp_naprava)

@@ -101,9 +101,6 @@ def izpisi_post():
     for stolpec in zaporedja[tip_izpisa]:
         vrstni_red_stolpcev.append(tabela_moznih_stolpcev[int(stolpec)])
 
-    for naprava in tabela_vseh_naprav:
-        print(naprava)
-
     if tip_izpisa == 'RLP':
         #za vse naprave zracunamo naslednji datum letnega pregleda
         for naprava in tabela_vseh_naprav:
