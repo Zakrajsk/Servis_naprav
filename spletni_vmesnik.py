@@ -264,16 +264,63 @@ def nedokoncani():
 
 @bottle.get('/odtujen/')
 def odtujen():
-    return bottle.template('odtujen.html', inventarna=None)
+    return bottle.template('odtujen.html', inventarna="", napaka="", izbrana=None)
 
 @bottle.post('/odtujen/')
 def odtujen_post():
     inventarna = bottle.request.forms.get('inventarna')
-    return bottle.template('odtujen.html', inventarna=inventarna)
+    
+    if bottle.request.forms.get('iskanje_naprave'):
+        inventarna = "74600" + bottle.request.forms.get('inventarna')
+        # 1 ce je odtujitev 2 ce je vrnitev
+        odtujitev = bottle.request.forms.get('Odtujitev_vrnitev')
+        trenutna_lokacija = Lokacija.zadnja_lokacija(inventarna)
+        napaka = False
+        if odtujitev == None:
+            napaka = "Ni bilo izbrano ali je odtujitev ali vrnitev"
+        if odtujitev == 'ODT':
+            #naprava je bila odtujena
+            if trenutna_lokacija == 'ODTUJENA':
+                #naprava je ze odtujena, zato vrnemo napako
+                napaka = "Naprava je že zabeležena kot odtujena"
+        if odtujitev == 'VRN':
+            #naprava je bila najdena
+            if trenutna_lokacija != 'ODTUJENA':
+                #ce ni odtujena potem ne more biti najdena
+                napaka = "Naprava ni odtujena"
+        return bottle.template(
+            'odtujen.html',
+            inventarna=inventarna,
+            naziv = Naprava.vrni_naziv(inventarna),
+            lokacija = trenutna_lokacija,
+            napaka = napaka,
+            izbrana = odtujitev)
+
+    elif bottle.request.forms.get('potrditev_sprememb'):
+        podatki = bottle.request.forms
+        inventarna = podatki.get('inventarna')
+        dan = podatki.get('dan')
+        mesec = podatki.get('mesec')
+        leto = podatki.get('leto')
+        odtujitev = podatki.get('Odtujitev_vrnitev')
+        datum = Datum.pretvori_v_niz(dan, mesec, leto)
+        
+        if odtujitev == 'ODT':
+            #napravo bomo dali kot odtujeno
+            Nahajanje.zakljuci_nahajanje(inventarna, datum)
+            novo_nahajanje = Nahajanje(datum, naprava=inventarna, lokacija='ODTUJENA')
+        else:
+            #napravo damo kot vrnjeno in jo postavimo na prejsno lokacijo
+            prejsna_lokacija = Nahajanje.lokacija_pred_odtujitvijo(inventarna)
+            print(prejsna_lokacija)
+            Nahajanje.zakljuci_nahajanje(inventarna, datum)
+            novo_nahajanje = Nahajanje(datum, naprava=inventarna, lokacija=prejsna_lokacija)
+        novo_nahajanje.dodaj_v_bazo()
+        return bottle.template('zacetna_stran.html')
 
 @bottle.get('/odpis/')
 def odpis():
-    return bottle.template('odpis.html', inventarna=None)
+    return bottle.template('odpis.html', inventarna="")
 
 @bottle.post('/odpis/')
 def odpis_post():

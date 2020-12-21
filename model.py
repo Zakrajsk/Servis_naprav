@@ -364,6 +364,43 @@ class Nahajanje:
             if do == None:
                 do = ''
             yield Nahajanje(od, do)
+
+    @staticmethod
+    def zakljuci_nahajanje(inventarna, datum):
+        """
+        Za napravo zakljuci nahajanje v katerem je trenutno
+        """
+        cur = conn.cursor()
+        sql = """
+        UPDATE nahajanje
+        SET [do] = ?
+        WHERE nahajanje.naprava = ? AND 
+            nahajanje.[do] IS NULL;
+        """
+        cur.execute(sql, [datum, inventarna])
+        conn.commit()
+        return 0
+    
+    @staticmethod
+    def lokacija_pred_odtujitvijo(inventarna):
+        """
+        Vrne na kateri lokaciji se je nahajala naprava pred odtujitvijo
+        """
+        cur = conn.cursor()
+        sql = """
+        SELECT lokacija.oznaka
+        FROM lokacija
+            JOIN
+            nahajanje ON lokacija.id = nahajanje.lokacija
+        WHERE nahajanje.naprava = ? AND 
+            nahajanje.[do] IS NOT NULL AND 
+            lokacija.oznaka != 'Odtujena'
+        ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC
+        LIMIT 1;
+        """
+        cur.execute(sql, [inventarna])
+        rez = cur.fetchone()
+        return rez[0] if rez != None else -1
     
     def dodaj_v_bazo(self):
         """

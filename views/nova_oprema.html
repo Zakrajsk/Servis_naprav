@@ -396,7 +396,7 @@
         for (var i = 1; i <= 12; i++)
             select_mesec.options[select_mesec.options.length] = new Option(i, i);
 
-        for (var i = 1980; i <= leto; i++)
+        for (var i = 1980; i <= leto + 10; i++)
             select_leto.options[select_leto.options.length] = new Option(i, i);
 
         select_mesec.selectedIndex = mesec - 1;
