@@ -33,6 +33,24 @@ class Naprava:
         self.rlp = rlp
     
     @staticmethod
+    def ali_obstaja(inventarna):
+        """
+        Vrne true, ce naprava obstaja drugace pa false
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT naprava.inventarna
+            FROM naprava
+            WHERE inventarna = ?
+        """
+        cur.execute(sql, [inventarna])
+        rez = cur.fetchone()
+        return True if rez != None else False
+
+
+
+
+    @staticmethod
     def opis_naprave(inventarna):
         """
         Vrne napravo z vsemi ustreznimi podatki za opis naprave
