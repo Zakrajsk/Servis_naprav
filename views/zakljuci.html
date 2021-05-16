@@ -21,7 +21,7 @@
                     <p>
                     <strong>Ups!</strong>
                     <br>
-                    Naprava še ni vrnjena.
+                    {{napaka}}
                     </p>
                 </div>
                 <div>
@@ -46,19 +46,14 @@
     <div class="columns is-gapless is-vcentered">
         <div class="column is-3">
             <div class="field-label is-normal">
-                <label class="label">Inventarna št</label>
+                <label class="label">Št naročila</label>
             </div>
         </div>
         <div class="column is-3">
             <div class="field-body has-addons">
                 <div class="field has-addons">
                     <p class="control">
-                        <a class="button is-static">
-                        74600
-                        </a>
-                    </p>
-                    <p class="control">
-                        <input class="input" type="text" name="inventarna" value="{{inventarna}}">
+                        <input class="input" type="text" name="st_narocila" value="{{st_narocila}}">
                     </p>
                 </div>
             </div>
@@ -69,7 +64,7 @@
     </div>
 
 
-    %if inventarna:
+    %if st_narocila:
     <div class="column is-8">
         <div class="field is-horizontal">
             <div class="field-label">

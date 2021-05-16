@@ -48,8 +48,6 @@ class Naprava:
         return True if rez != None else False
 
 
-
-
     @staticmethod
     def opis_naprave(inventarna):
         """
@@ -176,7 +174,7 @@ class Naprava:
         """
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
-        return rez[0]
+        return rez[0] if rez != None else -1
 
     @staticmethod
     def vrni_aktivacijske_podatke(inventarna):
@@ -312,6 +310,27 @@ class Popravilo:
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
         return rez[0] if rez != None else -1
+
+    @staticmethod
+    def vrni_popravilo_po_narocilu(st_narocila):
+        """
+        Vrne inventarno, ki ima doloceno st narocila in v st faze v kateri je
+        Ce ne najde opravila vrne -1
+        """
+        tabela_popravil = list()
+        cur = conn.cursor()
+        sql = """
+        SELECT popravilo.naprava
+        FROM faza
+            JOIN
+            popravilo ON faza.popravilo = popravilo.st_narocila
+        WHERE popravilo.st_narocila = ?;
+        """
+        for popravilo in conn.execute(sql, [st_narocila]):
+            tabela_popravil.append(popravilo[0])
+        if tabela_popravil == []:
+            return -1, -1
+        return (tabela_popravil[0], len(tabela_popravil))
 
 class Faza:
     """
@@ -458,7 +477,7 @@ class Lokacija:
         """
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
-        return rez[0]
+        return rez[0] if rez != None else -1
 
     @staticmethod
     def seznam_lokacij():

@@ -116,21 +116,33 @@ def izpisi_post():
 
 @bottle.get('/aktivacija-postopka/')
 def aktiviraj_postopek():
-    return bottle.template('aktivacija_postopka.html', inventarna="")
+    return bottle.template('aktivacija_postopka.html',
+                            inventarna="",
+                            napaka="")
 
 @bottle.post('/aktivacija-postopka/')
 def aktiviraj_postopek_post():
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = "74600" + bottle.request.forms.get('inventarna')
+        napaka = False
+        inventarna = bottle.request.forms.get('inventarna')
+        cela_inventarna = "74600" + inventarna
+        naziv = Naprava.vrni_naziv(cela_inventarna)
+        lokacija = Lokacija.zadnja_lokacija(cela_inventarna)
+        if naziv == -1:
+            napaka = "Naprave ni mogoče najti"
+            naziv = "Preveri vnešeno inventarno številko"
+            lokacija = "Preveri vnešeno inventarno številko"
         return bottle.template(
             'aktivacija_postopka.html',
             inventarna = inventarna,
-            naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Lokacija.zadnja_lokacija(inventarna))
+            naziv = naziv,
+            lokacija = lokacija,
+            napaka = napaka)
 
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
         inventarna = podatki.get('inventarna')
+        cela_inventarna = "74600" + inventarna
         st_narocila = podatki.get('st_narocila')
         opis_napake = podatki.get('opis_napake')
         tip = podatki.get('tip')
@@ -138,7 +150,7 @@ def aktiviraj_postopek_post():
         mesec = podatki.get('mesec')
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
-        popravilo = Popravilo(st_narocila, tip, opis_napake, inventarna)
+        popravilo = Popravilo(st_narocila, tip, opis_napake, cela_inventarna)
         faza = Faza('aktivacija', st_narocila, datum)
         popravilo.dodaj_v_bazo()
         faza.dodaj_v_bazo()
@@ -149,89 +161,131 @@ def aktiviraj_postopek_post():
 @bottle.get('/prevzem/')
 def prevzem():
     return bottle.template('prevzem.html',
-                            inventarna="",
+                            st_narocila="",
                             napaka="")
 
 @bottle.post('/prevzem/')
 def prevzem_post():
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = "74600" + bottle.request.forms.get('inventarna')
-        st, popravila = Popravilo.popravila_v_fazi(inventarna, 'aktivacija')
+        napaka = False
+        st_narocila = bottle.request.forms.get('st_narocila')
+        #st, popravila = Popravilo.popravila_v_fazi(inventarna, 'aktivacija')
+        inventarna, st_faze = Popravilo.vrni_popravilo_po_narocilu(st_narocila)
+        naziv = "Preveri vnešeno naročilo"
+        lokacija = "Preveri vnešeno naročilo"
+        if inventarna == -1 or st_faze <= 0:
+            napaka = "Za to naročilo še ni bila vnešena aktivacija postopka ali pa je napačno vnešena številka naročila."
+            
+        elif st_faze > 1:
+            napaka = "Za to narocilo je že bil vnešen prevzem."
+
+        else:
+            naziv = Naprava.vrni_naziv(inventarna)
+            lokacija = Lokacija.zadnja_lokacija(inventarna)
+
         return bottle.template(
             'prevzem.html',
-            inventarna = inventarna,
-            naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Lokacija.zadnja_lokacija(inventarna),
-            napaka = True if st == 0 else False)
+            st_narocila = st_narocila,
+            naziv = naziv,
+            lokacija = lokacija,
+            napaka = napaka)
 
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
-        inventarna = podatki.get('inventarna')
+        st_narocila = podatki.get('st_narocila')
         dan = podatki.get('dan')
         mesec = podatki.get('mesec')
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
-        st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'aktivacija')
-        faza = Faza('sprejem', popravilo[0], datum)
+        #st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'aktivacija')
+        faza = Faza('sprejem', st_narocila, datum)
         faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 
 @bottle.get('/vrnitev/')
 def vrnitev():
     return bottle.template('vrnitev.html',
-                            inventarna="",
+                            st_narocila="",
                             napaka="")
 
 @bottle.post('/vrnitev/')
 def vrnitev_post():
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = "74600" + bottle.request.forms.get('inventarna')
-        st, popravila = Popravilo.popravila_v_fazi(inventarna, 'sprejem')
+        napaka = False
+        st_narocila = bottle.request.forms.get('st_narocila')
+        #st, popravila = Popravilo.popravila_v_fazi(inventarna, 'sprejem')
+        inventarna, st_faze = Popravilo.vrni_popravilo_po_narocilu(st_narocila)
+        naziv = "Preveri vnešeno naročilo"
+        lokacija = "Preveri vnešeno naročilo"
+        if inventarna == -1 or st_faze <= 1:
+            napaka = "Za to naročilo še ni bil vnešen prevzem ali pa je napačno vnešena številka naročila."
+            
+        elif st_faze > 2:
+            napaka = "Za to narocilo je že bila vnešena vrnitev."
+
+        else:
+            naziv = Naprava.vrni_naziv(inventarna)
+            lokacija = Lokacija.zadnja_lokacija(inventarna)
+
         return bottle.template(
             'vrnitev.html',
-            inventarna=inventarna,
-            naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Lokacija.zadnja_lokacija(inventarna),
-            napaka = True if st == 0 else False)
+            st_narocila=st_narocila,
+            naziv = naziv,
+            lokacija = lokacija,
+            napaka = napaka)
 
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
-        inventarna = podatki.get('inventarna')
+        st_narocila = podatki.get('st_narocila')
         dan = podatki.get('dan')
         mesec = podatki.get('mesec')
         leto = podatki.get('leto')
         datum = Datum.pretvori_v_niz(dan, mesec, leto)
-        st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'sprejem')
-        faza = Faza('vrnitev', popravilo[0], datum)
+        #st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'sprejem')
+        faza = Faza('vrnitev', st_narocila, datum)
         faza.dodaj_v_bazo()
         if podatki.get('zakljucitev'):
-            koncna_faza = Faza('zakljuceno', popravilo[0])
+            koncna_faza = Faza('zakljuceno', st_narocila)
             koncna_faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 
 @bottle.get('/zakljucek/')
 def zakljuci():
     return bottle.template('zakljuci.html',
-                            inventarna="",
+                            st_narocila="",
                             napaka="")
 
 @bottle.post('/zakljucek/')
 def zakluci_post():
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = "74600" + bottle.request.forms.get('inventarna')
-        st, popravila = Popravilo.popravila_v_fazi(inventarna, 'vrnitev')
+        napaka = False
+        st_narocila = bottle.request.forms.get('st_narocila')
+        #st, popravila = Popravilo.popravila_v_fazi(inventarna, 'vrnitev')
+        inventarna, st_faze = Popravilo.vrni_popravilo_po_narocilu(st_narocila)
+        naziv = "Preveri vnešeno naročilo"
+        lokacija = "Preveri vnešeno naročilo"
+        if inventarna == -1 or st_faze <= 2:
+            napaka = "Za to naročilo še ni bila vnešena vrnitev ali pa je napačna številka naročila."
+            
+        elif st_faze > 3:
+            napaka = "To naročilo je že zaključeno ."
+
+        else:
+            naziv = Naprava.vrni_naziv(inventarna)
+            lokacija = Lokacija.zadnja_lokacija(inventarna)
+
         return bottle.template(
             'zakljuci.html',
-            inventarna=inventarna,
-            naziv = Naprava.vrni_naziv(inventarna),
-            lokacija = Lokacija.zadnja_lokacija(inventarna),
-            napaka = True if st == 0 else False)
+            st_narocila=st_narocila,
+            naziv = naziv,
+            lokacija = lokacija,
+            napaka = napaka)
 
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
-        inventarna = podatki.get('inventarna')
-        st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'vrnitev')
-        faza = Faza('zakljuceno', popravilo[0],)
+        st_narocila = podatki.get('st_narocila')
+        #st, popravilo = Popravilo.popravila_v_fazi(inventarna, 'vrnitev')
+        faza = Faza('zakljuceno', st_narocila)
         faza.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 

@@ -11,6 +11,37 @@
 </section>
 <a href="/" class="button is-primary is-large">Nazaj</a>
 
+%if napaka:
+<div class="modal is-active" id='pop_up'>
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="column is-7 is-offset-3">
+            <div class="box">
+                <div class="content">
+                    <p>
+                    <strong>Ups!</strong>
+                    <br>
+                    {{napaka}}
+                    </p>
+                </div>
+                <div>
+                    <button class="button is-success" id='zapri'>Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<script>
+    var pop_up = document.querySelector('#pop_up')
+    var zapri = document.querySelector('#zapri')
+    zapri.addEventListener('click', function(){
+        pop_up.classList.remove('is-active')
+    });
+</script>
+%end
+
+
 <form method="POST">
 
     <div class="columns is-gapless is-vcentered">
@@ -56,7 +87,7 @@
                 <label class="label">{{lokacija}}</label>
             </div>
         </div>
-
+    % if not napaka:
         <div class="field is-horizontal">
             <div class="field-label is-normal">
                 <label class="label">Datum aktivacije</label>
@@ -176,5 +207,6 @@
             posodobi_dneve(select_dan)
         }
     </script>
+    %end
 %end
 </form>
