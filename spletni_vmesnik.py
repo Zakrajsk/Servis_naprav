@@ -59,19 +59,34 @@ def nova_naprava_post():
 
 @bottle.get('/opis-naprave/')
 def opis_opreme():
-    return bottle.template('opis_naprave.html', inventarna=None)
+    return bottle.template('opis_naprave.html', inventarna="", napaka="")
 
 @bottle.post('/opis-naprave/')
 def opis_post():
-    inventarna =  "74600" + bottle.request.forms.get('inventarna')
+    inventarna = bottle.request.forms.get('inventarna')
+    cela_inventarna = "74600" + inventarna
+    napaka = False
+    naprava = Naprava.opis_naprave(cela_inventarna)
+    lokacija = ""
+    skrbnik = ""
+    popravila = []
+    odtujenosti = []
+    if naprava == None:
+        napaka = "Inventarna številka ne obstaja"
+    else:
+        lokacija = Lokacija.zadnja_lokacija(cela_inventarna)
+        skrbnik = Oseba.zadnji_skrbnik(cela_inventarna)
+        popravila = Popravilo.vrni_popravila(cela_inventarna)
+        odtujenosti = Nahajanje.odtujenosti(cela_inventarna)
     return bottle.template(
         'opis_naprave.html',
         inventarna=inventarna,
-        naprava = Naprava.opis_naprave(inventarna),
-        lokacija = Lokacija.zadnja_lokacija(inventarna),
-        skrbnik = Oseba.zadnji_skrbnik(inventarna),
-        popravila = Popravilo.vrni_popravila(inventarna),
-        odtujenosti = Nahajanje.odtujenosti(inventarna))
+        naprava = naprava,
+        lokacija = lokacija,
+        skrbnik = skrbnik,
+        popravila = popravila,
+        odtujenosti = odtujenosti,
+        napaka = napaka)
 
 @bottle.get('/izpisi/')
 def izpisi():
@@ -113,6 +128,17 @@ def izpisi_post():
         tabela_vseh_naprav.sort(key=lambda x: Datum.za_sortiranje(x['Naslednji RLP']))
                 
     return bottle.template('izpis.html', tip_izpisa=tip_izpisa, stolpci=vrstni_red_stolpcev, vse_naprave = tabela_vseh_naprav)
+
+
+@bottle.get('/sprememba-podatka/')
+def odpis():
+    return bottle.template('sprememba_podatka.html', inventarna="")
+
+@bottle.post('/spremeba-podatka/')
+def odpis_post():
+    inventarna = bottle.request.forms.get('inventarna')
+    return bottle.template('odpis.html', inventarna=inventarna)
+
 
 @bottle.get('/aktivacija-postopka/')
 def aktiviraj_postopek():

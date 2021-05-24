@@ -70,7 +70,7 @@ class Naprava:
         """
         cur.execute(sql, [inventarna])
         rez = cur.fetchone()
-        return Naprava(inventarna, *rez)
+        return Naprava(inventarna, *rez) if rez != None else None
     
     @staticmethod
     def vse_za_izpis(sortiraj_po):
@@ -492,9 +492,10 @@ class Lokacija:
             ORDER BY oznaka
         """
         for oznaka in conn.execute(sql):
+            if oznaka[0] == "ODTUJENA" or oznaka[0] == "ODPISANA":
+                continue
             tabela_lokacij.append(oznaka[0])
         return tabela_lokacij
-
 
 
 class Oseba:
