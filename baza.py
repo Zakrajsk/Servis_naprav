@@ -67,6 +67,7 @@ class Tabela():
         """
         Metoda za dodajanje vrstice
         """
+        print("izvede se dodaj vrstico za podatke:", podatki)
         if poizvedba is None:
             poizvedba = self.dodajanje(stevilo=len(podatki))
         for i in range(len(podatki)):
@@ -333,6 +334,7 @@ class Popravilo(Tabela):
                 tip         TEXT    NOT NULL
                                     CHECK (tip IN ('RLP', 'Popravilo', 'RLP in popravilo') ),
                 opis        TEXT,
+                opombe      TEXT,
                 naprava     INTEGER REFERENCES naprava (inventarna)
             );
         """)

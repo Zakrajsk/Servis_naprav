@@ -212,14 +212,29 @@ class Popravilo:
     """
     Razred za popravilo
     """
-    def __init__(self, st_narocila, tip, opis, naprava):
+    def __init__(self, st_narocila, tip, opis, opombe, naprava):
         """
         Konstruktor popravila
         """
         self.st_narocila = st_narocila
         self.tip = tip
         self.opis = opis
+        self.opombe = opombe
         self.naprava = naprava
+
+    @staticmethod
+    def dodaj_opombo(st_narocila, opomba):
+        """
+        Doda tekst opombe v popravilo z danim st narocila
+        """
+        cur = conn.cursor()
+        sql = """
+            UPDATE popravilo
+            SET opombe = ?
+            WHERE st_narocila = ?;
+        """
+        cur.execute(sql, [opomba, st_narocila])
+
 
     @staticmethod
     def vrni_popravila(inventarna):
@@ -230,6 +245,7 @@ class Popravilo:
             SELECT popravilo.st_narocila,
                 popravilo.tip,
                 popravilo.opis,
+                popravilo.opombe,
                 faza.datum as aktivacija
             FROM popravilo
                 JOIN 
@@ -237,15 +253,16 @@ class Popravilo:
             WHERE popravilo.naprava = ? AND faza.stopnja = 'aktivacija'
             ORDER BY substr(aktivacija, 7) || substr(aktivacija, 4, 2) || substr(aktivacija, 1, 2) DESC
         """
-        for st_narocila, tip, opis, aktivacija in conn.execute(sql, [inventarna]):
+        for st_narocila, tip, opis, opombe, aktivacija in conn.execute(sql, [inventarna]):
             yield {'tip': tip, 'opis': opis, 'aktivacija': aktivacija,
             'sprejem': Faza.datum_stopnje('sprejem', st_narocila),
-            'vrnitev': Faza.datum_stopnje('vrnitev', st_narocila)}
+            'vrnitev': Faza.datum_stopnje('vrnitev', st_narocila),
+            'opombe': opombe if opombe!= None else ''}
     
     def dodaj_v_bazo(self):
-        insert = popravilo.dodajanje(["st_narocila", "tip", "opis", "naprava"])
+        insert = popravilo.dodajanje(["st_narocila", "tip", "opis", "opombe", "naprava"])
         with conn:
-            popravilo.dodaj_vrstico([self.st_narocila, self.tip, self.opis, self.naprava], insert)
+            popravilo.dodaj_vrstico([self.st_narocila, self.tip, self.opis, self.opombe, self.naprava], insert)
 
     @staticmethod
     def popravila_v_fazi(inventarna, faza):
