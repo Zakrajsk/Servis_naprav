@@ -354,7 +354,6 @@ def odtujen_post():
     
     if bottle.request.forms.get('iskanje_naprave'):
         inventarna = "74600" + bottle.request.forms.get('inventarna')
-        # 1 ce je odtujitev 2 ce je vrnitev
         odtujitev = bottle.request.forms.get('Odtujitev_vrnitev')
         trenutna_lokacija = Lokacija.zadnja_lokacija(inventarna)
         napaka = False
@@ -402,12 +401,56 @@ def odtujen_post():
 
 @bottle.get('/odpis/')
 def odpis():
-    return bottle.template('odpis.html', inventarna="")
+    return bottle.template('odpis.html', inventarna="", napaka="", izbrana=None)
 
 @bottle.post('/odpis/')
 def odpis_post():
     inventarna = bottle.request.forms.get('inventarna')
-    return bottle.template('odpis.html', inventarna=inventarna)
+    cela_inventarna = "74600" + inventarna
+    if bottle.request.forms.get('iskanje_naprave'):
+        vrsta_vnosa = bottle.request.forms.get('zacni_koncaj')
+        trenutna_lokacija = Lokacija.zadnja_lokacija(cela_inventarna)
+        napaka = False
+        if vrsta_vnosa == None:
+            napaka = "Ni bilo izbrano ali se začne postopek ali dokončen odpis "
+        if vrsta_vnosa == 'ZAC':
+            #naprava je bila odtujena
+            if trenutna_lokacija == 'POSTOPEK ODPISA':
+                #naprava je ze odtujena, zato vrnemo napako
+                napaka = "Naprava je že v postopku odpisa"
+        if vrsta_vnosa == 'KON':
+            #naprava je bila dokoncno odpisana
+            if trenutna_lokacija != 'POSTOPEK ODPISA':
+                #Naprava se ni bila v postopku odpisa
+                napaka = "Za napravo se ni bil aktiviran postopek odpisa"
+        return bottle.template(
+            'odpis.html',
+            inventarna=inventarna,
+            naziv = Naprava.vrni_naziv(cela_inventarna),
+            lokacija = trenutna_lokacija,
+            napaka = napaka,
+            izbrana = vrsta_vnosa)
+
+    elif bottle.request.forms.get('potrditev_sprememb'):
+        podatki = bottle.request.forms
+        inventarna = podatki.get('inventarna')
+        cela_inventarna = "74600" + inventarna
+        dan = podatki.get('dan')
+        mesec = podatki.get('mesec')
+        leto = podatki.get('leto')
+        odtujitev = podatki.get('zacni_koncaj')
+        datum = Datum.pretvori_v_niz(dan, mesec, leto)
+        
+        if odtujitev == 'ZAC':
+            #napravo bomo dali v postopek odtujitve
+            Nahajanje.zakljuci_nahajanje(cela_inventarna, datum)
+            novo_nahajanje = Nahajanje(datum, naprava=cela_inventarna, lokacija="POSTOPEK ODPISA")
+        else:
+            #napravo damo kot odpisano
+            Nahajanje.zakljuci_nahajanje(cela_inventarna, datum)
+            novo_nahajanje = Nahajanje(datum, naprava=cela_inventarna, lokacija="ODPISANA")
+        novo_nahajanje.dodaj_v_bazo()
+        return bottle.template('zacetna_stran.html')
 
 
 bottle.run(debug=True, reloader=True)

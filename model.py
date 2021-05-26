@@ -123,7 +123,7 @@ class Naprava:
                 JOIN
                 lokacija ON lokacija.id = nahajanje.lokacija
             WHERE nahajanje.[do] IS NULL AND 
-                lokacija.oznaka LIKE 'odpisana';
+                lokacija.oznaka LIKE 'ODPISANA';
         """
         tabela_ustreznih = list()
         for inventarna, naziv, tip, serijska, serviser, od, lokacija in conn.execute(sql):
@@ -152,7 +152,7 @@ class Naprava:
                 JOIN
                 lokacija ON lokacija.id = nahajanje.lokacija
             WHERE nahajanje.[do] IS NULL AND 
-                lokacija.oznaka LIKE 'odtujena';
+                lokacija.oznaka LIKE 'ODTUJENA';
         """
         tabela_ustreznih = list()
         for inventarna, naziv, tip, serijska, serviser, od, lokacija in conn.execute(sql):
@@ -471,7 +471,7 @@ class Lokacija:
     """
     Razred za lokacijo
     """
-    def __init(self, oznaka):
+    def __init__(self, oznaka):
         """
         Konstruktor lokacije
         """

@@ -11,24 +11,87 @@
 </section>
 <a href="/" class="button is-primary is-large">Nazaj</a>
 
+%if napaka:
+<div class="modal is-active" id='pop_up'>
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="column is-7 is-offset-3">
+            <div class="box">
+                <div class="content">
+                    <p>
+                    <strong>Ups!</strong>
+                    <br>
+                    {{napaka}}
+                    </p>
+                </div>
+                <div>
+                    <button class="button is-success" id='zapri'>Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<script>
+    var pop_up = document.querySelector('#pop_up')
+    var zapri = document.querySelector('#zapri')
+    zapri.addEventListener('click', function(){
+        pop_up.classList.remove('is-active')
+    });
+</script>
+%end
+
 <form method="POST">
 
-    <div class="columns is-gapless is-vcentered">
+    <div class="columns is-gapless">
         <div class="column is-3">
             <div class="field-label is-normal">
                 <label class="label">Inventarna št</label>
             </div>
         </div>
-        <div class="column is-2">
+        <div class="column is-3">
             <div class="field-body has-addons">
-                <p class="control"><input class="input" type="text" name="inventarna"></p>
+                <div class="field has-addons">
+                    <p class="control">
+                        <a class="button is-static">
+                        74600
+                        </a>
+                    </p>
+                    <p class="control">
+                        <input class="input" type="text" name="inventarna" value="{{inventarna}}">
+                    </p>
+                </div>
+            </div>
+            <div class="field is-horizontal">
+                <div class="field-body">
+                <div class="field is-narrow">
+                    <div class="control">
+                    <label class="radio">
+                        %if izbrana == 'ZAC':
+                        <input type="radio" name="zacni_koncaj", value="ZAC" checked>
+                        %else:
+                        <input type="radio" name="zacni_koncaj", value="ZAC">
+                        %end
+                        Začni postopek
+                    </label>
+                    <label class="radio">
+                        %if izbrana == 'KON':
+                        <input type="radio" name="zacni_koncaj", value="KON" checked>
+                        %else:
+                        <input type="radio" name="zacni_koncaj", value="KON">
+                        %end
+                        Končni odpis
+                    </label>
+                    </div>
+                </div>
+                </div>
             </div>
         </div>
         <div class="column">
-            <input class="button is-primary is-large" type="submit" value="Poizvej"></input>
+            <input class="button is-primary is-large" type="submit" value="Poizvej" name="iskanje_naprave"></input>
         </div>
     </div>
-</form>
+
 
 %if inventarna:
 <div class="column is-8">
@@ -37,7 +100,7 @@
             <label class="label">Naziv</label>
         </div>
         <div class="field-body">
-            <label class="label">{{inventarna}}</label>
+            <label class="label">{{naziv}}</label>
         </div>
     </div>
     <div class="field is-horizontal">
@@ -45,44 +108,90 @@
             <label class="label">Lokacija</label>
         </div>
         <div class="field-body">
-            <label class="label">{{inventarna}}</label>
+            <label class="label">{{lokacija}}</label>
         </div>
     </div>
 
-    <div class="field is-horizontal">
-        <div class="field-label is-normal">
-            <label class="label">Datum odpisa</label>
-        </div>
-        <div class="field-body">
-            <div class="select">
-                <select>
-                    <option>01</option>
-                    <option>02</option>
-                    <option>03</option>
-                </select>
+    %if not napaka:
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Datum Odpisa</label>
             </div>
-            <div class="select">
-                <select>
-                    <option>01</option>
-                    <option>02</option>
-                    <option>03</option>
-                </select>
-            </div>
-            <div class="select">
-                <select>
-                    <option>2016</option>
-                    <option>2017</option>
-                    <option>2018</option>
-                </select>
+            <div class="field-body">
+                <div class="select">
+                    <select id="select_dan" name="dan">
+                    </select>
+                </div>
+                <div class="select">
+                    <select id="select_mesec" name="mesec">
+                    </select>
+                </div>
+                <div class="select">
+                    <select id="select_leto" name="leto">
+                    </select>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="columns">
-    <div class="column is-offset-4">
-        <input class="button is-primary is-large" type="submit" value="Potrdi spremembe"></input>
+    <div class="column is-offset-6">
+        <input class="button is-primary is-large" type="submit" value="Potrdi spremembe" name="potrditev_sprememb"></input>
     </div>
-</div>
 
+    <script>
+        function posodobi_dneve(selectElement) {
+            trenutno_izbran_dan = selectElement.value;
+            var i, L = selectElement.options.length - 1;
+            for(i = L; i >= 0; i--) 
+                selectElement.remove(i);
+        
+            mesec = document.getElementById("select_mesec").value;
+            leto = document.getElementById("select_leto").value;
 
+            if (mesec == 2)
+                if (((leto % 4 == 0) && (leto % 100 != 0)) || (leto % 400 == 0))
+                    st_dni = 29;
+                else
+                    st_dni = 28;
+            else
+                if (["2", "4", "6", "9", "11"].includes(mesec))
+                    st_dni = 30;
+                else
+                    st_dni = 31;
+        
+            for (var i = 1; i <= st_dni; i++)
+                selectElement.options[selectElement.options.length] = new Option(i, i);
+            
+            selectElement.selectedIndex = trenutno_izbran_dan - 1
+        }
+
+        n = new Date();
+        leto = n.getFullYear();
+        mesec = n.getMonth() + 1;
+        dan = n.getDate();
+
+        select_dan = document.getElementById("select_dan");
+        select_mesec = document.getElementById("select_mesec");
+        select_leto = document.getElementById("select_leto");
+        
+        for (var i = 1; i <= 12; i++)
+            select_mesec.options[select_mesec.options.length] = new Option(i, i);
+
+        for (var i = 1980; i <= leto; i++)
+            select_leto.options[select_leto.options.length] = new Option(i, i);
+
+        select_mesec.selectedIndex = mesec - 1;
+        select_leto.value = leto;
+        posodobi_dneve(select_dan);
+        select_dan.selectedIndex = dan - 1;
+
+        select_mesec.onchange = function(){
+            posodobi_dneve(select_dan)
+        }
+        
+        select_leto.onchange = function(){
+            posodobi_dneve(select_dan)
+        }
+    </script>
+    %end
 %end
+</form>
