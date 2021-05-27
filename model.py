@@ -162,6 +162,37 @@ class Naprava:
         return tabela_ustreznih
 
     @staticmethod
+    def vse_v_postopku_odpisa():
+        """
+        Vrne vse naprave, ki so odtujene, od njih vrne vse ustrezne podatke
+        """
+        conn.cursor()
+        sql = """
+            SELECT naprava.inventarna,
+                naprava.naziv,
+                naprava.tip,
+                naprava.serijska,
+                naprava.serviser,
+                nahajanje.od,
+                lokacija.oznaka
+            FROM naprava
+                JOIN
+                nahajanje ON naprava.inventarna = nahajanje.naprava
+                JOIN
+                lokacija ON lokacija.id = nahajanje.lokacija
+            WHERE nahajanje.[do] IS NULL AND 
+                lokacija.oznaka LIKE 'POSTOPEK ODPISA';
+        """
+        tabela_ustreznih = list()
+        st = 1
+        for inventarna, naziv, tip, serijska, serviser, od, lokacija in conn.execute(sql):
+            temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
+                            'Servis': serviser, 'Datum_postopka': od, 'Lokacija': lokacija, 'zap_st': st}
+            st += 1
+            tabela_ustreznih.append(temp_naprava)
+        return tabela_ustreznih
+
+    @staticmethod
     def vrni_naziv(inventarna):
         """
         Vrne naziv naprave

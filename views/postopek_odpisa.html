@@ -1,0 +1,52 @@
+% rebase('osnova.html')
+
+<section class="hero">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <h1 class="title is-1">
+                Naprave v postopku odpisa
+            </h1>
+        </div>
+    </div>
+</section>
+<a href="/" class="button is-primary is-large">Nazaj</a>
+
+
+<div class="table-container">
+    <table class="table is-striped is-fullwidth is-hoverable is-bordered">
+        <thead>
+            <tr>
+                <th>
+                    <p class="has-text-centered">Št</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">Inventarna</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">Naziv</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">Tip</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">Servis</p>
+                </th>
+                <th>
+                    <p class="has-text-centered">Datum zacetka postopka</p>
+                </th>
+            </tr>
+          </thead>
+          <tbody>
+              % for ena in vse_naprave:
+              <tr>
+                  <td>{{ena['zap_st']}}</td>
+                  <td>{{ena['Inventarna']}}</td>
+                  <td>{{ena['Naziv']}}</td>
+                  <td>{{ena['Tip']}}</td>
+                  <td>{{ena['Servis']}}</td>
+                  <td>{{ena['Datum_postopka']}}</td>
+              </tr>
+              %end
+          </tbody>
+    </table>
+  </div>

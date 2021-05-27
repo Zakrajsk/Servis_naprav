@@ -399,6 +399,13 @@ def odtujen_post():
         novo_nahajanje.dodaj_v_bazo()
         return bottle.template('zacetna_stran.html')
 
+@bottle.get('/postopek-odpisa/')
+def aktivirane_naprave():
+    vse_naprave_v_postopku_odpisa = Naprava.vse_v_postopku_odpisa()
+    print(vse_naprave_v_postopku_odpisa)
+    return bottle.template('postopek_odpisa.html', vse_naprave=vse_naprave_v_postopku_odpisa)
+
+
 @bottle.get('/odpis/')
 def odpis():
     return bottle.template('odpis.html', inventarna="", napaka="", izbrana=None)

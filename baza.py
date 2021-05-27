@@ -1,3 +1,4 @@
+from bottle import load
 import csv
 
 class Tabela():
@@ -67,7 +68,6 @@ class Tabela():
         """
         Metoda za dodajanje vrstice
         """
-        print("izvede se dodaj vrstico za podatke:", podatki)
         if poizvedba is None:
             poizvedba = self.dodajanje(stevilo=len(podatki))
         for i in range(len(podatki)):
@@ -244,6 +244,18 @@ class Lokacija(Tabela):
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 oznaka TEXT UNIQUE
             );
+        """)
+        self.conn.execute("""
+            INSERT INTO lokacija (oznaka)
+            VALUES ("ODTUJENA");
+        """)
+        self.conn.execute("""
+            INSERT INTO lokacija (oznaka)
+            VALUES ("POSTOPEK ODPISA");
+        """)
+        self.conn.execute("""
+            INSERT INTO lokacija (oznaka)
+            VALUES ("ODPISANA");
         """)
     
     def dodaj_vrstico(self, podatki, poizvedba=None):
