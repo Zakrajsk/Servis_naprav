@@ -208,10 +208,11 @@
                 </div>
                 <div class="select">
                     <select name="RLP">
-                        <option value='' selected disabled hidden></option>
+                        <option value='-' selected disabled hidden></option>
                         <option>12</option>
                         <option>18</option>
                         <option>24</option>
+                        <option>-</option>
                     </select>
                 </div>
             </div>
@@ -395,9 +396,11 @@
         
         for (var i = 1; i <= 12; i++)
             select_mesec.options[select_mesec.options.length] = new Option(i, i);
+        select_mesec.options[select_mesec.options.length] = new Option("-", "-")
 
         for (var i = 1980; i <= leto + 10; i++)
             select_leto.options[select_leto.options.length] = new Option(i, i);
+        select_leto.options[select_leto.options.length] = new Option("-", "-")
 
         select_mesec.selectedIndex = mesec - 1;
         select_leto.value = leto;
@@ -436,8 +439,11 @@
         
             for (var i = 1; i <= st_dni; i++)
                 dan.options[dan.options.length] = new Option(i, i);
-            
-            dan.selectedIndex = trenutno_izbran_dan - 1
+            dan.options[dan.options.length] = new Option("-", "-")
+            if (trenutno_izbran_dan == "-")
+                dan.selectedIndex = dan.options.length - 1
+            else
+                dan.selectedIndex = trenutno_izbran_dan - 1
         }
 
     function odpri_obrazec(ime_obrazca){

@@ -93,11 +93,47 @@ class Naprava:
                 JOIN
                 lokacija ON lokacija.id = nahajanje.lokacija
             WHERE nahajanje.[do] IS NULL AND 
-                lokacija.oznaka NOT LIKE 'odtujena'
+                lokacija.oznaka NOT LIKE 'ODTUJENA'
             ORDER BY
         """ + sortiraj_po + ";"
         tabela_ustreznih = list()
         for inventarna, naziv, tip, serijska, serviser, rlp, dobava, lokacija in cur.execute(sql):
+            if lokacija == "ODPISANA" or lokacija == "ODTUJENA" or lokacija == "POSTOPEK ODPISA":
+                continue
+            temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
+                            'Servis': serviser, 'RLP': rlp, 'Dobava': dobava, 'Lokacija': lokacija}
+            tabela_ustreznih.append(temp_naprava)
+        return tabela_ustreznih
+
+    @staticmethod
+    def vse_za_rlp_izpis(sortiraj_po):
+        """
+        Vrne tabele vseh naprav predstavljeno s slovarjem, ki niso odtujene
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT naprava.inventarna,
+                naprava.naziv,
+                naprava.tip,
+                naprava.serijska,
+                naprava.serviser,
+                naprava.rlp,
+                naprava.dobava,
+                lokacija.oznaka
+            FROM naprava
+                JOIN
+                nahajanje ON naprava.inventarna = nahajanje.naprava
+                JOIN
+                lokacija ON lokacija.id = nahajanje.lokacija
+            WHERE nahajanje.[do] IS NULL AND 
+                lokacija.oznaka NOT LIKE 'ODTUJENA' AND
+                naprava.rlp NOT LIKE '-'
+            ORDER BY
+        """ + sortiraj_po + ";"
+        tabela_ustreznih = list()
+        for inventarna, naziv, tip, serijska, serviser, rlp, dobava, lokacija in cur.execute(sql):
+            if lokacija == "ODPISANA" or lokacija == "ODTUJENA" or lokacija == "POSTOPEK ODPISA":
+                continue
             temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
                             'Servis': serviser, 'RLP': rlp, 'Dobava': dobava, 'Lokacija': lokacija}
             tabela_ustreznih.append(temp_naprava)
@@ -285,7 +321,7 @@ class Popravilo:
             ORDER BY substr(aktivacija, 7) || substr(aktivacija, 4, 2) || substr(aktivacija, 1, 2) DESC
         """
         for st_narocila, tip, opis, opombe, aktivacija in conn.execute(sql, [inventarna]):
-            yield {'tip': tip, 'opis': opis, 'aktivacija': aktivacija,
+            yield {'tip': tip, 'opis': opis if opis != None else "", 'aktivacija': aktivacija,
             'sprejem': Faza.datum_stopnje('sprejem', st_narocila),
             'vrnitev': Faza.datum_stopnje('vrnitev', st_narocila),
             'opombe': opombe if opombe!= None else ''}
@@ -540,7 +576,7 @@ class Lokacija:
             ORDER BY oznaka
         """
         for oznaka in conn.execute(sql):
-            if oznaka[0] == "ODTUJENA" or oznaka[0] == "ODPISANA":
+            if oznaka[0] == "ODTUJENA" or oznaka[0] == "ODPISANA" or oznaka[0] == "POSTOPEK ODPISA":
                 continue
             tabela_lokacij.append(oznaka[0])
         return tabela_lokacij
@@ -714,8 +750,14 @@ class Datum:
         """
         Pretvori datum v niz za v bazo v format dd.mm.yyyy
         """
-        niz_dan = dan if int(dan) >= 10 else ('0' + dan)
-        niz_mesec = mesec if int(mesec) >= 10 else ('0' + mesec)
+        if dan != "-":
+            niz_dan = dan if int(dan) >= 10 else ('0' + dan)
+        else:
+            niz_dan = "-"
+        if mesec != "-":
+            niz_mesec = mesec if int(mesec) >= 10 else ('0' + mesec)
+        else:
+            niz_mesec = "-"
         return '.'.join([niz_dan, niz_mesec, leto])
     
     @staticmethod

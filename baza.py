@@ -94,18 +94,17 @@ class Naprava(Tabela):
         """
         self.conn.execute("""
             CREATE TABLE naprava (
-                inventarna   INTEGER PRIMARY KEY,
+                inventarna   TEXT PRIMARY KEY,
                 naziv        TEXT    NOT NULL,
                 tip          TEXT    NOT NULL,
                 garancija    DATE,
                 proizvajalec TEXT,
-                serijska     TEXT    NOT NULL
-                                    UNIQUE,
+                serijska     TEXT    NOT NULL,
                 dobavitelj   TEXT REFERENCES Podjetje (naziv),
                 dobava       DATE,
                 serviser     TEXT REFERENCES Podjetje (naziv),
                 stroskovno   TEXT    REFERENCES Stroskovno_mesto (oznaka),
-                rlp          INTEGER CHECK (RLP IN (12, 18, 24))
+                rlp          TEXT
             );
         """)
 
@@ -224,7 +223,7 @@ class Skrbnistvo(Tabela):
                 od DATE NOT NULL,
                 [do] DATE,
                 skrbnik INTERGER REFERENCES oseba (id),
-                naprava INTEGER REFERENCES naprava (inventarna)
+                naprava TEXT REFERENCES naprava (inventarna)
             );
         """)
 
@@ -297,7 +296,7 @@ class Nahajanje(Tabela):
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 od DATE NOT NULL,
                 [do] DATE,
-                naprava INTEGER REFERENCES naprava (inventarna),
+                naprava TEXT REFERENCES naprava (inventarna),
                 lokacija INTEGER REFERENCES lokacija (id)
             );
         """)
@@ -342,12 +341,12 @@ class Popravilo(Tabela):
         """
         self.conn.execute("""
             CREATE TABLE popravilo (
-                st_narocila INTEGER PRIMARY KEY,
+                st_narocila TEXT PRIMARY KEY,
                 tip         TEXT    NOT NULL
                                     CHECK (tip IN ('RLP', 'Popravilo', 'RLP in popravilo') ),
                 opis        TEXT,
                 opombe      TEXT,
-                naprava     INTEGER REFERENCES naprava (inventarna)
+                naprava     TEXT REFERENCES naprava (inventarna)
             );
         """)
 
@@ -367,7 +366,7 @@ class Faza(Tabela):
             CREATE TABLE faza (
                 datum DATE,
                 stopnja TEXT CHECK (stopnja IN ('aktivacija', 'sprejem', 'vrnitev', 'zakljuceno') ),
-                popravilo INTEGER REFERENCES Popravilo (St_narocila),
+                popravilo TEXT REFERENCES Popravilo (St_narocila),
                 PRIMARY KEY (
                     popravilo,
                     stopnja

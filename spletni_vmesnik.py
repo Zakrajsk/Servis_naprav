@@ -19,7 +19,7 @@ def nova_naprava():
 @bottle.post('/nova-oprema/')
 def nova_naprava_post():
     podatki = bottle.request.forms
-    print(*podatki)
+    print(podatki.skrbnik)
     celotna_inventarna = "74600" + podatki['inventarna']
 
     garancija = Datum.pretvori_v_niz(podatki['dan_garancija'], podatki['mesec_garancija'], podatki['leto_garancija'])
@@ -106,8 +106,10 @@ def izpisi_post():
 
     slovar_sortiranja = {'lokacije': 'lokacija.oznaka', 'serviserji': 'naprava.serviser', 'nazivi': 'naprava.naziv', 'RLP': 'naprava.naziv'}
 
-    if tip_izpisa not in ['odpisani', 'odtujeni']:
+    if tip_izpisa not in ['odpisani', 'odtujeni', "RLP"]:
         tabela_vseh_naprav = Naprava.vse_za_izpis(slovar_sortiranja[tip_izpisa])
+    elif tip_izpisa == 'RLP':
+        tabela_vseh_naprav = Naprava.vse_za_rlp_izpis(slovar_sortiranja[tip_izpisa])
     elif tip_izpisa == 'odpisani':
         tabela_vseh_naprav = Naprava.vse_odpisane()
     else:
@@ -121,7 +123,11 @@ def izpisi_post():
         for naprava in tabela_vseh_naprav:
             datum_zadnjega_RLP = Popravilo.zadnji_rlp(naprava['Inventarna'])
             if datum_zadnjega_RLP == -1:
-                naprava['Naslednji RLP'] = Datum.pristej_mesece(naprava['Dobava'], naprava['RLP'])
+                print(naprava["RLP"])
+                if '-' in naprava['Dobava']:
+                    naprava['Naslednji RLP'] = "Se_ne_da " + naprava['Dobava']
+                else:
+                    naprava['Naslednji RLP'] = Datum.pristej_mesece(naprava['Dobava'], naprava['RLP'])
             else:
                 nov_datum = Datum.pristej_mesece(datum_zadnjega_RLP, naprava['RLP'])
                 naprava['Naslednji RLP'] = nov_datum
