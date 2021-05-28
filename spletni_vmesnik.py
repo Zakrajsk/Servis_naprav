@@ -131,13 +131,45 @@ def izpisi_post():
 
 
 @bottle.get('/sprememba-podatka/')
-def odpis():
-    return bottle.template('sprememba_podatka.html', inventarna="")
+def sprememba_podatka():
+    return bottle.template('sprememba_podatka.html', inventarna="", napaka="", tip_spremembe=False)
 
-@bottle.post('/spremeba-podatka/')
-def odpis_post():
-    inventarna = bottle.request.forms.get('inventarna')
-    return bottle.template('odpis.html', inventarna=inventarna)
+@bottle.post('/sprememba-podatka/')
+def sprememba_podatka_post():
+    if bottle.request.forms.get('iskanje_naprave'):
+        inventarna = bottle.request.forms.get('inventarna')
+        izbrano = bottle.request.forms.get('katera_sprememba')
+        napaka = False
+        podatki = {'tabela' : [], 'lokacija': ""}
+        izbran_tip = False
+        tip_spremembe = {'naziv': 1, 'tip': 1, 'serijska': 1, 'lokacija': 6, 'stroskovno': 2,
+                        'skrbnik': 3, 'proizvajalec': 1, 'dobavitelj': 3, 'serviser': 3, 'RLP': 5,
+                        'garancija': 4, 'dobava': 4 }
+        if izbrano == None:
+            napaka = "Ni izbrano kaj želiš spreminjati!"
+        else:
+            izbran_tip = tip_spremembe[izbrano]
+        cela_inventarna = "74600" + inventarna
+
+        naziv = Naprava.vrni_naziv(cela_inventarna)
+        if naziv == -1:
+            napaka = "Naprava z to inventarno ne obstaja"
+            naziv = "Preveri inventarno"
+
+        if izbrano == "lokacija":
+            podatki['lokacija'] = Lokacija.zadnja_lokacija(cela_inventarna)
+            podatki['tabela'] = Lokacija.seznam_lokacij()
+        
+        return bottle.template('sprememba_podatka.html',
+                                inventarna=inventarna,
+                                naziv = naziv,
+                                napaka = napaka,
+                                tip_spremembe=izbran_tip,
+                                podatki = podatki)
+
+    elif bottle.request.forms.get('potrditev_sprememb'):
+        return bottle.template('zacetna_stran.html')
+
 
 
 @bottle.get('/aktivacija-postopka/')
@@ -353,9 +385,10 @@ def odtujen_post():
     inventarna = bottle.request.forms.get('inventarna')
     
     if bottle.request.forms.get('iskanje_naprave'):
-        inventarna = "74600" + bottle.request.forms.get('inventarna')
+        inventarna = bottle.request.forms.get('inventarna')
+        cela_inventarna = "74600" + inventarna
         odtujitev = bottle.request.forms.get('Odtujitev_vrnitev')
-        trenutna_lokacija = Lokacija.zadnja_lokacija(inventarna)
+        trenutna_lokacija = Lokacija.zadnja_lokacija(cela_inventarna)
         napaka = False
         if odtujitev == None:
             napaka = "Ni bilo izbrano ali je odtujitev ali vrnitev"
@@ -369,17 +402,24 @@ def odtujen_post():
             if trenutna_lokacija != 'ODTUJENA':
                 #ce ni odtujena potem ne more biti najdena
                 napaka = "Naprava ni odtujena"
+        
+        naziv = Naprava.vrni_naziv(cela_inventarna)
+        if naziv == -1:
+            napaka = "Inventarna številka ne obstaja"
+            naziv = "Preveri inventarno številko"
+            trenutna_lokacija = "Preveri inventarno številko"
+
         return bottle.template(
             'odtujen.html',
             inventarna=inventarna,
-            naziv = Naprava.vrni_naziv(inventarna),
+            naziv = naziv,
             lokacija = trenutna_lokacija,
             napaka = napaka,
             izbrana = odtujitev)
 
     elif bottle.request.forms.get('potrditev_sprememb'):
         podatki = bottle.request.forms
-        inventarna = podatki.get('inventarna')
+        inventarna = "74600" + podatki.get('inventarna')
         dan = podatki.get('dan')
         mesec = podatki.get('mesec')
         leto = podatki.get('leto')
@@ -400,9 +440,8 @@ def odtujen_post():
         return bottle.template('zacetna_stran.html')
 
 @bottle.get('/postopek-odpisa/')
-def aktivirane_naprave():
+def postopek_odpisa():
     vse_naprave_v_postopku_odpisa = Naprava.vse_v_postopku_odpisa()
-    print(vse_naprave_v_postopku_odpisa)
     return bottle.template('postopek_odpisa.html', vse_naprave=vse_naprave_v_postopku_odpisa)
 
 
@@ -430,10 +469,16 @@ def odpis_post():
             if trenutna_lokacija != 'POSTOPEK ODPISA':
                 #Naprava se ni bila v postopku odpisa
                 napaka = "Za napravo se ni bil aktiviran postopek odpisa"
+        naziv = Naprava.vrni_naziv(cela_inventarna)
+        if naziv == -1:
+            napaka = "Inventarna številka ne obstaja"
+            naziv = "Preveri inventarno številko"
+            trenutna_lokacija = "Preveri inventarno številko"
+
         return bottle.template(
             'odpis.html',
             inventarna=inventarna,
-            naziv = Naprava.vrni_naziv(cela_inventarna),
+            naziv = naziv,
             lokacija = trenutna_lokacija,
             napaka = napaka,
             izbrana = vrsta_vnosa)
