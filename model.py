@@ -195,7 +195,8 @@ class Naprava:
                 JOIN
                 lokacija ON lokacija.id = nahajanje.lokacija
             WHERE nahajanje.[do] IS NULL AND 
-                lokacija.oznaka LIKE 'ODPISANA';
+                lokacija.oznaka LIKE 'ODPISANA'
+                ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC;
         """
         tabela_ustreznih = list()
         for inventarna, naziv, tip, serijska, serviser, od, lokacija in conn.execute(sql):
@@ -224,7 +225,8 @@ class Naprava:
                 JOIN
                 lokacija ON lokacija.id = nahajanje.lokacija
             WHERE nahajanje.[do] IS NULL AND 
-                lokacija.oznaka LIKE 'ODTUJENA';
+                lokacija.oznaka LIKE 'ODTUJENA'
+                ORDER BY substr(nahajanje.od, 7) || substr(nahajanje.od, 4, 2) || substr(nahajanje.od, 1, 2) DESC;
         """
         tabela_ustreznih = list()
         for inventarna, naziv, tip, serijska, serviser, od, lokacija in conn.execute(sql):

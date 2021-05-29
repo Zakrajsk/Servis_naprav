@@ -174,7 +174,7 @@
                         %end
                     </select>
                 </div>
-                <button class="button is-primary" type="button" id="dodaj"><i class="far fa-plus-square fa-lg"></i></button>    
+                <button class="button is-primary" type="button" id="dodaj_dodajanje"><i class="far fa-plus-square fa-lg"></i></button>    
             </div>
         </div>
         <div class="field is-horizontal">
@@ -196,11 +196,33 @@
                 </div>
             </div>
         </div>
+        <div class="modal" id='obrazec_dodajanje'>
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                <div class="column is-offset-3">
+                    <div class="box">
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Nova</label>
+                            </div>
+                            <div class="field-body has-addons">
+                                <p class="control"><input class="input" type="text" id="vnos_dodajanje"></p>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="button is-success" type="button" id='potrdi_dodajanje'>Potrdi</button>
+                            <button class="button is-danger is-pulled-right" type="button" id="preklici_dodajanje">Prekliči</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         %end
     </div>
     <div class="column is-offset-6">
         <input class="button is-primary is-large" type="submit" value="Potrdi" name="potrditev_sprememb"></input>
     </div>
+
 
     <script>
         function posodobi_dneve(selectElement) {
@@ -256,6 +278,48 @@
         select_leto.onchange = function(){
             posodobi_dneve(select_dan)
         }
+
+        function odpri_obrazec(ime_obrazca){
+        var obrazec = document.querySelector('#obrazec_' + ime_obrazca);
+        obrazec.classList.add('is-active');
+    }
+
+    function potrdi_obrazec(ime_obrazca){
+        var obrazec = document.querySelector('#obrazec_' + ime_obrazca);
+        var vnos = document.getElementById('vnos_' + ime_obrazca).value;
+        var select = document.getElementById('select_' + ime_obrazca);
+        select.options[select.options.length] = new Option(vnos, vnos);
+        select.value = vnos;
+        obrazec.classList.remove('is-active');
+    }
+
+    function preklici_obrazec(ime_obrazca){
+        var obrazec = document.querySelector('#obrazec_' + ime_obrazca);
+        obrazec.classList.remove('is-active');
+    }
+
+    function ustvari_eventlistener(ime, index){
+        var prikazi = document.querySelector('#dodaj_' + ime);
+        var potrdi = document.querySelector('#potrdi_' + ime);
+        var preklici = document.querySelector('#preklici_' + ime);
+
+        prikazi.addEventListener('click', function(){
+            odpri_obrazec(ime);
+        });
+
+        potrdi.addEventListener('click', function(){
+            potrdi_obrazec(ime);
+        });
+
+        preklici.addEventListener('click', function(){
+            preklici_obrazec(ime);
+        });
+    }
+
+    var tabela_dodajanj = ['dodajanje'];
+    tabela_dodajanj.forEach(ustvari_eventlistener);
+
+
     </script>
     %end
 %end
