@@ -43,18 +43,22 @@
 <table class="table is-striped is-fullwidth is-hoverable is-bordered">
     <thead>
       <tr>
+        <th><abbr>Št</abbr></th>
         %for ime in stolpci:
         <th><abbr>{{ime}}</abbr></th>
         %end
       </tr>
     </thead>
     <tbody>
+        %st = 1
         %for naprava in vse_naprave:
         <tr>
+            <td>{{st}}</td>
             %for oznaka in stolpci:
             <td>{{naprava[oznaka]}}</td>
             %end
         </tr>
+        % st += 1
         %end
     </tbody>    
 </table>

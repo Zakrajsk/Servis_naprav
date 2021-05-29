@@ -97,12 +97,14 @@ class Naprava:
             ORDER BY
         """ + sortiraj_po + ";"
         tabela_ustreznih = list()
+        st = 1
         for inventarna, naziv, tip, serijska, serviser, rlp, dobava, lokacija in cur.execute(sql):
             if lokacija == "ODPISANA" or lokacija == "ODTUJENA" or lokacija == "POSTOPEK ODPISA":
                 continue
-            temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
+            temp_naprava = {'Št': st, 'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
                             'Servis': serviser, 'RLP': rlp, 'Dobava': dobava, 'Lokacija': lokacija}
             tabela_ustreznih.append(temp_naprava)
+            st += 1
         return tabela_ustreznih
 
     @staticmethod
@@ -128,6 +130,40 @@ class Naprava:
             WHERE nahajanje.[do] IS NULL AND 
                 lokacija.oznaka NOT LIKE 'ODTUJENA' AND
                 naprava.rlp NOT LIKE '-'
+            ORDER BY
+        """ + sortiraj_po + ";"
+        tabela_ustreznih = list()
+        for inventarna, naziv, tip, serijska, serviser, rlp, dobava, lokacija in cur.execute(sql):
+            if lokacija == "ODPISANA" or lokacija == "ODTUJENA" or lokacija == "POSTOPEK ODPISA":
+                continue
+            temp_naprava = {'Inventarna': inventarna, 'Naziv': naziv, 'Tip' : tip, 'Serijska': serijska,
+                            'Servis': serviser, 'RLP': rlp, 'Dobava': dobava, 'Lokacija': lokacija}
+            tabela_ustreznih.append(temp_naprava)
+        return tabela_ustreznih
+
+    @staticmethod
+    def vse_brez_rlp_izpis(sortiraj_po):
+        """
+        Vrne tabele vseh naprav predstavljeno s slovarjem, ki niso odtujene
+        """
+        cur = conn.cursor()
+        sql = """
+            SELECT naprava.inventarna,
+                naprava.naziv,
+                naprava.tip,
+                naprava.serijska,
+                naprava.serviser,
+                naprava.rlp,
+                naprava.dobava,
+                lokacija.oznaka
+            FROM naprava
+                JOIN
+                nahajanje ON naprava.inventarna = nahajanje.naprava
+                JOIN
+                lokacija ON lokacija.id = nahajanje.lokacija
+            WHERE nahajanje.[do] IS NULL AND 
+                lokacija.oznaka NOT LIKE 'ODTUJENA' AND
+                naprava.rlp LIKE '-'
             ORDER BY
         """ + sortiraj_po + ";"
         tabela_ustreznih = list()

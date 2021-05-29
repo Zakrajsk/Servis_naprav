@@ -102,14 +102,16 @@ def izpisi_post():
                               'Datum odpisa', 'Datum odtujitve']
     
     zaporedja = {'lokacije': '501234', 'serviserji': '401235', 'RLP': '6012354', 'odpisani': '7012354',
-                 'odtujeni': '8012354', 'nazivi': '102354'}
+                 'odtujeni': '8012354', 'nazivi': '102354', 'brez_RLP': '102354'}
 
     slovar_sortiranja = {'lokacije': 'lokacija.oznaka', 'serviserji': 'naprava.serviser', 'nazivi': 'naprava.naziv', 'RLP': 'naprava.naziv'}
 
-    if tip_izpisa not in ['odpisani', 'odtujeni', "RLP"]:
+    if tip_izpisa not in ['odpisani', 'odtujeni', "RLP", "brez_RLP"]:
         tabela_vseh_naprav = Naprava.vse_za_izpis(slovar_sortiranja[tip_izpisa])
     elif tip_izpisa == 'RLP':
         tabela_vseh_naprav = Naprava.vse_za_rlp_izpis(slovar_sortiranja[tip_izpisa])
+    elif tip_izpisa == "brez_RLP":
+        tabela_vseh_naprav = Naprava.vse_brez_rlp_izpis(slovar_sortiranja['RLP'])
     elif tip_izpisa == 'odpisani':
         tabela_vseh_naprav = Naprava.vse_odpisane()
     else:
@@ -119,11 +121,11 @@ def izpisi_post():
         vrstni_red_stolpcev.append(tabela_moznih_stolpcev[int(stolpec)])
 
     if tip_izpisa == 'RLP':
+        st = 0
         #za vse naprave zracunamo naslednji datum letnega pregleda
         for naprava in tabela_vseh_naprav:
             datum_zadnjega_RLP = Popravilo.zadnji_rlp(naprava['Inventarna'])
             if datum_zadnjega_RLP == -1:
-                print(naprava["RLP"])
                 if '-' in naprava['Dobava']:
                     naprava['Naslednji RLP'] = "Se_ne_da " + naprava['Dobava']
                 else:
